@@ -29,7 +29,7 @@
                 <tr>
                     <td>
                         <label class="btn btn-block btn-primary">
-                            Browse&hellip; <input type="file" multiple name="fileData" id="uploadFormControlFile1"
+                            Browse&hellip; <input type="file" accept="${formats}" multiple name="fileData" id="uploadFormControlFile1"
                                                   style="display: none;">
                         </label>
                         <script>
