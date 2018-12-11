@@ -11,16 +11,15 @@ import java.util.List;
 
 //https://www.concretepage.com/mybatis-3/mybatis-3-annotation-example-with-select-insert-update-and-delete
 public interface GroupMapper {
-    /*    private Integer id;
-    private String groupName;
-    private Set<User> users;
-    private Set<Attach> attaches;*/
+
     @Select("SELECT * FROM javapet.users left join users_groups on id=users_groups.user_id where group_id = #{id}")
-    @ResultMap("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers.UserMapper.userMap")
+//    @ResultMap("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers.UserMapper.userMap")
+    @ResultType(User.class)
     List<User> selectUsersByGroupId(Integer id);
 
     @Select("SELECT * FROM javapet.attachments left join attachments_groups on id=attachments_groups.attach_id where group_id = #{id}")
-    @ResultMap("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers.AttachMapper.attachmentMap")
+    //@ResultMap("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers.AttachMapper.attachmentMap")
+    @ResultType(Attach.class)
     List<Attach> selectAttachesByGroupId(Integer id);
 
     @Results(id = "groupMap", value = {
@@ -30,7 +29,7 @@ public interface GroupMapper {
                     many = @Many(select = "selectUsersByGroupId",
                             fetchType = FetchType.LAZY)),
             @Result(property = "attaches", column = "id", javaType = List.class,
-                    many = @Many(select = "selectAttachesByGroupID",
+                    many = @Many(select = "selectAttachesByGroupId",
                             fetchType = FetchType.LAZY))
     })
 

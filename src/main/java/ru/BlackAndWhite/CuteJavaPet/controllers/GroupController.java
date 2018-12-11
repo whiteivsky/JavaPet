@@ -27,6 +27,8 @@ public class GroupController {
 
     @GetMapping(path = "groups")
     public String manageUserGroups(ModelMap model) {
+        List<Group> allGr = groupService.selectAllGroups();
+        List<Group> userGr = userService.getCurrentLoggedUser().getGroups();
         model.addAttribute("isActiveGroup", "class=\"active\"")
                 .addAttribute("groups",
                         getAllGroupsWithChecked(groupService.selectAllGroups(),
