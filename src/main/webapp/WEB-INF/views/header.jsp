@@ -37,9 +37,12 @@
                         <li ${isActiveUpload}><A HREF="/upload">upload</a></li>
                         <li ${isActiveGroup}><A HREF="/groups">groups</a></li>
                     </ul>
-                    <div class="nav navbar-right">
-                        <p class="navbar-text">Signed in as ${pageContext.request.userPrincipal.name}</p>
-                        <button type="button" class="btn btn-default navbar-btn" onClick='location.href="/logout"'>out</button>
+                    <div class="navbar-right">
+                        <ul class="nav nav nav-pills navbar-nav navbar-left">
+                        <p class="navbar-text">You signed in as ${pageContext.request.userPrincipal.name}</p>
+                            <li class="active"><A HREF="/logout">out</a></li>
+                        <%--<button type="button" class="btn btn-default navbar-btn" onClick='location.href="/logout"'>out</button>--%>
+                        </ul>
                     </div>
                 </div>
 
