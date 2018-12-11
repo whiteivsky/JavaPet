@@ -47,7 +47,6 @@
             <c:otherwise>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-
                         <li><A HREF="/login">login</a></li>
                         <li><A HREF="/registration">registration</a></li>
                     </ul>

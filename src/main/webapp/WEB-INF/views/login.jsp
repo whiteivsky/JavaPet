@@ -25,9 +25,8 @@
 </head>
 
 <body>
-
 <div class="container">
-    <form method="POST" action="${contextPath}/login" class="form-signin" role="form"  accept-charset=utf-8>
+    <form method="POST" action="${contextPath}/login" class="form-signin" role="form" accept-charset=utf-8>
         <h2 class="form-signin-heading ">Log in</h2>
 
         <div class="form-group ${error != null ? 'has-error' : ''}">
@@ -39,11 +38,8 @@
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
             <button class="btn btn-lg btn-primary btn-block" type="submit">Log In</button>
-            <br>
-
         </div>
     </form>
-
 </div>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

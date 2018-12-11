@@ -55,7 +55,6 @@ public interface GroupMapper {
 
     @Delete("DELETE FROM users_groups  WHERE ((users_groups.user_id = #{user_id}) and (users_groups.group_id = #{group_id}))")
     void delUserGroup(@Param("user_id") Integer user_id, @Param("group_id") Integer group_id);
-
 }
 
 
