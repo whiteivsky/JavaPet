@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(new String[]{"/img/**", "/css/**", "/fonts/**", "/js/**"})
                 .permitAll()
-                .antMatchers(new String[]{"/", "/registration", "/admin"})
+                .antMatchers(new String[]{"/", "/registration"})
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -53,6 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf()
                 .disable();
+
+
         //                .antMatchers("/protected/**").access("hasRole('ROLE_ADMIN')")
 //                .antMatchers("/confidential/**").access("hasRole('ROLE_SUPERADMIN')")
 //                .and().formLogin().defaultSuccessUrl("/", true);

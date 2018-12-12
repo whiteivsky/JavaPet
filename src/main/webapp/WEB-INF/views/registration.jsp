@@ -8,10 +8,10 @@
 
 <%@ include file="header.jsp" %>
 
-<title>Upload page</title>
+<title>Registration page</title>
 <legend>Create a new user account</legend>
 
-<form class="input-group" method="post" action="${contextPath}/registration">
+<form  method="post" action="${contextPath}/registration">
     <div class="panel panel-default">
         <div class="panel-heading"> Input registration data</div>
         <div class="panel-body">
