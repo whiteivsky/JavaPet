@@ -1,0 +1,8 @@
+delete ATTACHMENTS_GROUPS;
+delete USERS_GROUPS;
+delete USERS_ROLES;
+delete FILEFORMATS;
+delete USERS;
+delete ROLES;
+delete GROUPS;
+delete ATTACHMENTS;

@@ -22,11 +22,15 @@ public class MyBatisConfig {
 
     @Bean
     public DataSource dataSource() {
+
         DataSource dataSource = new DataSource();
-        dataSource.setUrl(env.getRequiredProperty("db.url"));
+//        dataSource.setUrl(env.getRequiredProperty("db.url"));
+        dataSource.setUrl("jdbc:h2:" + System.getProperty("user.dir") + "/H2DB/db;INIT=RUNSCRIPT FROM 'classpath:sqlScripts/truncate.sql'\\;RUNSCRIPT FROM 'classpath:sqlScripts/createTables.sql'\\;RUNSCRIPT FROM 'classpath:sqlScripts/insertData.sql'");
         dataSource.setUsername(env.getRequiredProperty("db.username"));
         dataSource.setPassword(env.getRequiredProperty("db.password"));
         dataSource.setDriverClassName(env.getRequiredProperty("db.driver"));
+//        dataSource.setDriverClass(org.h2.Driver);
+//        System.getProperty("user.dir") + "/H2db/db";
         return dataSource;
     }
 

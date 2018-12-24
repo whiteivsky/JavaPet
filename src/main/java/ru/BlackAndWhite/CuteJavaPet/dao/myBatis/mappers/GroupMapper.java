@@ -15,11 +15,11 @@ public interface GroupMapper {
     private String groupName;
     private Set<User> users;
     private Set<Attach> attaches;*/
-    @Select("SELECT * FROM javapet.users left join users_groups on id=users_groups.user_id where group_id = #{id}")
+    @Select("SELECT * FROM users left join users_groups on id=users_groups.user_id where group_id = #{id}")
     @ResultMap("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers.UserMapper.userMap")
     List<User> selectUsersByGroupId(Integer id);
 
-    @Select("SELECT * FROM javapet.attachments left join attachments_groups on id=attachments_groups.attach_id where group_id = #{id}")
+    @Select("SELECT * FROM attachments left join attachments_groups on id=attachments_groups.attach_id where group_id = #{id}")
     @ResultMap("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers.AttachMapper.attachmentMap")
     List<Attach> selectAttachesByGroupId(Integer id);
 
@@ -34,19 +34,19 @@ public interface GroupMapper {
                             fetchType = FetchType.LAZY))
     })
 
-    @Select("SELECT * FROM javapet.groups left join users_groups on id=users_groups.group_id where user_id = #{id}")
+    @Select("SELECT * FROM groups left join users_groups on id=users_groups.group_id where user_id = #{id}")
     List<Group> selectGroupsByUserId(Integer id);
 
-    @Select("SELECT * from javapet.groups where ID = #{id}")
+    @Select("SELECT * from groups where ID = #{id}")
     Group selectGroup(Integer id);
 
-    @Select("SELECT * from javapet.groups ")
+    @Select("SELECT * from groups ")
     List<Group> selectAllGroups();
 
-    @Select("SELECT * from javapet.groups where javapet.groups.groupname = #{groupName}")
+    @Select("SELECT * from groups where groups.groupname = #{groupName}")
     Group selectGroupByName(String groupName);
 
-    @Insert("INSERT INTO javapet.groups VALUES (#{id}, #{groupName})")
+    @Insert("INSERT INTO groups VALUES (#{id}, #{groupName})")
     @Options(useGeneratedKeys = true)
     void createGroup(Group group);
 
