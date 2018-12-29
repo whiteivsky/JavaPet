@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j
 @Service
@@ -39,11 +40,13 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public List<String> saveAttachments(String filedescription, MultipartFile[] files) {
-        List<String> uploadStatuses = new ArrayList<>();
-        for (MultipartFile fileData : Arrays.asList(files)) {
-            uploadStatuses.add(saveAttach(filedescription, fileData));
-        }
-        return uploadStatuses;
+//        List<String> uploadStatuses = new ArrayList<>();
+//        for (MultipartFile fileData : files) {
+//            uploadStatuses.add(saveAttach(filedescription, fileData));
+//        }
+        return Arrays.stream(files)
+                .map(multipartFile -> saveAttach(filedescription, multipartFile))
+                .collect(Collectors.toList());
     }
 
     private String saveAttach(String fileDescription, MultipartFile fileData) {
@@ -51,23 +54,32 @@ public class AttachmentServiceImpl implements AttachmentService {
             return env.getProperty("empty") + "'" + fileData.getOriginalFilename() + "' is empty";
         if (fileFormatService.getIconByExt(fileData.getOriginalFilename()) == null)
             return env.getProperty("wrongFormat") + "'" + fileData.getOriginalFilename() + "' have wrong format";
-        String uploadStatuses;
+        return someSave(fileDescription, fileData);
+    }
+
+    private String someSave(String fileDescription, MultipartFile fileData) {
+        //String uploadStatuses;
         try {
-            Attach uploadAttachment = new Attach();
-            uploadAttachment.setMediaType(fileData.getContentType());
-            uploadAttachment.setMultiPartFileData(fileData);
-            uploadAttachment.setDescription(fileDescription);
-            uploadAttachment.setFileName(fileData.getOriginalFilename());
-            uploadAttachment.setOwner(userService.getCurrentLoggedUser());
+            Attach uploadAttachment = getAttach(fileDescription, fileData);
             attachDAO.saveAttach(uploadAttachment);
             attachDAO.addAttachGroups(uploadAttachment, groupDAO.selectGroupsByUserId(uploadAttachment.getOwner().getId()));
 
-            uploadStatuses = env.getProperty("success") + "'" + uploadAttachment.getFileName() + "' upload done";
+            return env.getProperty("success") + "'" + uploadAttachment.getFileName() + "' upload done";
         } catch (Exception e) {
             log.error(e);
-            uploadStatuses = e.getLocalizedMessage();
+           return e.getLocalizedMessage();
         }
-        return uploadStatuses;
+        //return uploadStatuses;
+    }
+
+    private Attach getAttach(String fileDescription, MultipartFile fileData) throws IOException {
+        Attach uploadAttachment = new Attach();
+        uploadAttachment.setMediaType(fileData.getContentType());
+        uploadAttachment.setMultiPartFileData(fileData);
+        uploadAttachment.setDescription(fileDescription);
+        uploadAttachment.setFileName(fileData.getOriginalFilename());
+        uploadAttachment.setOwner(userService.getCurrentLoggedUser());
+        return uploadAttachment;
     }
 
     @Override
