@@ -1,9 +1,9 @@
 package ru.BlackAndWhite.CuteJavaPet.services.servicesImpl;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Log4j
 @Service
-@PropertySource(value ={"classpath:/email.properties","classpath:/uploadStatuses.properties"})
+@PropertySource(value = {"classpath:/email.properties", "classpath:/uploadStatuses.properties"})
 public class AttachmentServiceImpl implements AttachmentService {
     @Resource
     Environment env;
@@ -38,38 +38,48 @@ public class AttachmentServiceImpl implements AttachmentService {
     FileFormatServiceImpl fileFormatService;
 
 
-    private void saveAttach(Attach attach) {
+    @Override
+    public List<String> saveAttachments(String filedescription, MultipartFile[] files) {
+//        List<String> uploadStatuses = new ArrayList<>();
+//        for (MultipartFile fileData : files) {
+//            uploadStatuses.add(saveAttach(filedescription, fileData));
+//        }
+        return Arrays.stream(files)
+                .map(multipartFile -> saveAttach(filedescription, multipartFile))
+                .collect(Collectors.toList());
+    }
+
+    private String saveAttach(String fileDescription, MultipartFile fileData) {
+        if (fileData.isEmpty())
+            return env.getProperty("empty") + "'" + fileData.getOriginalFilename() + "' is empty";
+        if (fileFormatService.getIconByExt(fileData.getOriginalFilename()) == null)
+            return env.getProperty("wrongFormat") + "'" + fileData.getOriginalFilename() + "' have wrong format";
+        return someSave(fileDescription, fileData);
+    }
+
+    private String someSave(String fileDescription, MultipartFile fileData) {
+        //String uploadStatuses;
         try {
-            attach.setOwner(userService.getCurrentLoggedUser());
-            attachDAO.saveAttach(attach);
-            attachDAO.addAttachGroups(attach,
-                    groupDAO.selectGroupsByUserId(attach.getOwner().getId()));
+            Attach uploadAttachment = getAttach(fileDescription, fileData);
+            attachDAO.saveAttach(uploadAttachment);
+            attachDAO.addAttachGroups(uploadAttachment, groupDAO.selectGroupsByUserId(uploadAttachment.getOwner().getId()));
+
+            return env.getProperty("success") + "'" + uploadAttachment.getFileName() + "' upload done";
         } catch (Exception e) {
             log.error(e);
+           return e.getLocalizedMessage();
         }
+        //return uploadStatuses;
     }
 
-    @Override
-    public void addAttachmentGroups(Attach attach, List<Group> groupSet) {
-        if ((groupSet != null) & (attach != null)) {
-            groupSet.forEach(curGroup -> {
-                try {
-                    attachDAO.addAttachGroup(attach, curGroup);
-                } catch (Exception e) {
-                    log.error(e);
-                }
-            });
-        }
-    }
-
-    @Override
-    public Attach selectAttachmentByID(int id) throws Exception {
-        return attachDAO.selectAttachByID(id);
-    }
-
-    @Override
-    public List<Attach> selectAttachmentsByUserID(int id) throws Exception {
-        return attachDAO.selectAttachesByID(id);
+    private Attach getAttach(String fileDescription, MultipartFile fileData) throws IOException {
+        Attach uploadAttachment = new Attach();
+        uploadAttachment.setMediaType(fileData.getContentType());
+        uploadAttachment.setMultiPartFileData(fileData);
+        uploadAttachment.setDescription(fileDescription);
+        uploadAttachment.setFileName(fileData.getOriginalFilename());
+        uploadAttachment.setOwner(userService.getCurrentLoggedUser());
+        return uploadAttachment;
     }
 
     @Override
@@ -78,61 +88,46 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<String> saveAttachments(String filedescription, MultipartFile[] files) {
-        List<String> uploadStatuses = new ArrayList<>();
-        List<MultipartFile> fileList = new ArrayList<>(Arrays.asList(files));
-
-        fileList.removeAll(fileList.stream()
-                .sequential()
-                .filter(MultipartFile::isEmpty)
-                .peek(file -> uploadStatuses.add(env.getProperty("empty")+"'" +
-                        file.getOriginalFilename() + "' is empty"))
-                .collect(Collectors.toList()));
-
-        fileList.removeAll(fileList.stream()
-                .sequential()
-                .filter(file ->
-                        (fileFormatService.getIconByExt(file.getOriginalFilename()) == null))
-                .peek(file -> uploadStatuses.add(env.getProperty("wrongFormat")+"'" +
-                        file.getOriginalFilename() + "' have wrong format"))
-                .collect(Collectors.toList()));
-
-        List<Attach> attachesForNotice = new ArrayList<>();
-        if (!fileList.isEmpty()) {
-            fileList.stream()
-                    .sequential()
-                    .forEach(fileData -> saveAttachAndNotice(filedescription, uploadStatuses, fileData, attachesForNotice));
-        }
-//        EmailServiceImpl.generateAndSendNotice(
-//                env.getProperty("dLogin"),
-//                env.getProperty("dPass"),
-//                attachesForNotice,
-//                groupDAO.getEmailsByGroups(userService.getCurrentLoggedUser().getGroups()));
-        return uploadStatuses;
+    public Attach selectAttachmentByID(int id) throws Exception {
+        return attachDAO.selectAttachByID(id);
     }
 
-    private void saveAttachAndNotice(String filedescription, List<String> uploadStatuses, MultipartFile fileData, List<Attach> attachesForNotice) {
 
-        try {
-            Attach uploadAttachment = setAttach(filedescription, fileData);
-            saveAttach(uploadAttachment);
-            if (uploadAttachment.getId() != 0) {
-                attachesForNotice.add(uploadAttachment);
-            }
-            uploadStatuses.add(env.getProperty("success")+"'" + uploadAttachment.getFileName() + "' upload done");
-        } catch (Exception e) {
-            uploadStatuses.add(e.getLocalizedMessage());
-        }
-
-    }
-
-    private Attach setAttach(String filedescription, MultipartFile fileData) throws IOException {
-        Attach uploadAttachment = new Attach();
-        uploadAttachment.setMediaType(fileData.getContentType());
-        uploadAttachment.setMultiPartFileData(fileData);
-        uploadAttachment.setDescription(filedescription);
-        uploadAttachment.setFileName(fileData.getOriginalFilename());
-        uploadAttachment.setOwner(userService.getCurrentLoggedUser());
-        return uploadAttachment;
-    }
+//    @Override
+//    public List<Attach> selectAttachmentsByUserID(int id) throws Exception {
+//        return attachDAO.selectAttachesByID(id);
+//    }
+//
+//    @Override
+//    public void addAttachmentGroups(Attach attach, List<Group> groupSet) {
+//        if ((groupSet != null) & (attach != null)) {
+//            groupSet.forEach(curGroup -> {
+//                try {
+//                    attachDAO.addAttachGroup(attach, curGroup);
+//                } catch (Exception e) {
+//                    log.error(e);
+//                }
+//            });
+//        }
+//    }
+//    private void saveAttach(Attach attach) {
+//        try {
+//            attach.setOwner(userService.getCurrentLoggedUser());
+//            attachDAO.saveAttach(attach);
+//            attachDAO.addAttachGroups(attach,
+//                    groupDAO.selectGroupsByUserId(attach.getOwner().getId()));
+//        } catch (Exception e) {
+//            log.error(e);
+//        }
+//    }
+//
+//    private Attach setAttach(String filedescription, MultipartFile fileData) throws IOException {
+//        Attach uploadAttachment = new Attach();
+//        uploadAttachment.setMediaType(fileData.getContentType());
+//        uploadAttachment.setMultiPartFileData(fileData);
+//        uploadAttachment.setDescription(filedescription);
+//        uploadAttachment.setFileName(fileData.getOriginalFilename());
+//        uploadAttachment.setOwner(userService.getCurrentLoggedUser());
+//        return uploadAttachment;
+//    }
 }

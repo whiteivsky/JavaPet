@@ -1,4 +1,4 @@
-create table users
+CREATE TABLE IF NOT EXISTS users
 (
   ID       int auto_increment
     primary key,
@@ -11,7 +11,7 @@ create table users
     unique (username)
 );
 
-create table roles
+CREATE TABLE IF NOT EXISTS roles
 (
   ID   int auto_increment
     primary key,
@@ -20,7 +20,7 @@ create table roles
     unique (name)
 );
 
-create table `groups`
+CREATE TABLE IF NOT EXISTS `groups`
 (
   ID        int auto_increment
     primary key,
@@ -29,7 +29,7 @@ create table `groups`
     unique (groupname)
 );
 
-create table attachments
+CREATE TABLE IF NOT EXISTS attachments
 (
   ID          int auto_increment
     primary key,
@@ -44,7 +44,7 @@ create table attachments
     foreign key (owner_id) references users (id)
 );
 
-create table attachments_groups
+CREATE TABLE IF NOT EXISTS attachments_groups
 (
   attach_id int not null,
   group_id  int not null,
@@ -54,7 +54,7 @@ create table attachments_groups
     foreign key (attach_id) references attachments (id)
 );
 
-create table users_roles
+CREATE TABLE IF NOT EXISTS users_roles
 (
   user_id int not null,
   role_id int not null,
@@ -66,7 +66,7 @@ create table users_roles
     foreign key (user_id) references users (id)
 );
 
-create table users_groups
+CREATE TABLE IF NOT EXISTS users_groups
 (
   user_id  int not null,
   group_id int not null,
@@ -75,7 +75,7 @@ create table users_groups
   constraint users_groups_users_id_fk
     foreign key (user_id) references users (id)
 );
-create table fileformats
+CREATE TABLE IF NOT EXISTS fileformats
 (
   id   int auto_increment primary key,
   name varchar(10) not null,

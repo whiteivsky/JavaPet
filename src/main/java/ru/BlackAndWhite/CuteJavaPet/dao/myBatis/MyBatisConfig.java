@@ -23,7 +23,12 @@ public class MyBatisConfig {
     @Bean
     public DataSource dataSource() {
         DataSource dataSource = new DataSource();
-        dataSource.setUrl(env.getRequiredProperty("db.url"));
+//        dataSource.setUrl(env.getRequiredProperty("db.url"));
+        //todo перенести обратно в настройки...
+//        dataSource.setUrl("jdbc:h2:" + System.getProperty("user.dir") + "/H2DB/db;INIT=RUNSCRIPT FROM 'classpath:sqlScripts/truncate.sql'\\;RUNSCRIPT FROM 'classpath:sqlScripts/createTables.sql'\\;RUNSCRIPT FROM 'classpath:sqlScripts/insertData.sql'");
+        dataSource.setUrl("jdbc:h2:" + System.getProperty("user.dir") + "/H2DB/db;INIT=RUNSCRIPT FROM 'classpath:sqlScripts/createTables.sql'\\;RUNSCRIPT FROM 'classpath:sqlScripts/insertData.sql'");
+//        dataSource.setUrl("jdbc:h2:" + System.getProperty("user.dir") + "/H2DB/db;INIT=RUNSCRIPT FROM 'classpath:sqlScripts/createTables.sql'");
+        System.out.println("jdbc:h2:" + System.getProperty("user.dir") + "/H2DB/db");
         dataSource.setUsername(env.getRequiredProperty("db.username"));
         dataSource.setPassword(env.getRequiredProperty("db.password"));
         dataSource.setDriverClassName(env.getRequiredProperty("db.driver"));

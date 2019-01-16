@@ -12,9 +12,8 @@ public interface AttachmentService {
 
     Attach selectAttachmentByID(int id) throws Exception;
 
-    List<Attach> selectAttachmentsByUserID(int id) throws Exception;
-
     List<Attach> selectAttachmentsbyUser(User user) throws Exception;
 
-    void addAttachmentGroups(Attach attach, List<Group> groupSet);
+//    List<Attach> selectAttachmentsByUserID(int id) throws Exception;
+//    void addAttachmentGroups(Attach attach, List<Group> groupSet);
 }
