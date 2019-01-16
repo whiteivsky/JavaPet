@@ -47,11 +47,11 @@ public class UserController {
     }
 
     @GetMapping(path = "login")
-    public String login(@RequestParam(value = "error", required = false) String error,
+    public String login(@RequestParam(value = "WEB-INF/error", required = false) String error,
                         @RequestParam(value = "logout", required = false) String logout,
                         Model model) {
         if (error != null) {
-            model.addAttribute("error", "Username or password is incorrect.");
+            model.addAttribute("WEB-INF/error", "Username or password is incorrect.");
         }
         if (logout != null) {
             model.addAttribute("message", "Logged out successfully.");

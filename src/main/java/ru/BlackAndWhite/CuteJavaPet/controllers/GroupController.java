@@ -47,10 +47,19 @@ public class GroupController {
 
     private List<GroupCheckedList> getAllGroupsWithChecked(List<Group> allGroups, List<Group> userGroups) {
         List<GroupCheckedList> groupCheckedLists = new ArrayList<>();
-        for (Group allGroup : allGroups) {
-            allGroup.setUsers(groupService.selectUsersByGroup(allGroup));
-            groupCheckedLists.add(
-                    new GroupCheckedList(allGroup, userGroups.contains(allGroup)));
+        try {
+
+            for (Group allGroup : allGroups) {
+                allGroup.setUsers(groupService.selectUsersByGroup(allGroup));
+                groupCheckedLists.add(
+                        new GroupCheckedList(allGroup, userGroups.contains(allGroup)));
+            }
+        } catch (IllegalArgumentException e) {
+            for (Group allGroup : allGroups) {
+                allGroup.setUsers(groupService.selectUsersByGroup(allGroup));
+                groupCheckedLists.add(
+                        new GroupCheckedList(allGroup, false));
+            }
         }
         return groupCheckedLists;
     }
@@ -70,7 +79,7 @@ public class GroupController {
         List<String> convertUserNames(List<User> userNames) {
             List<String> stringUserNames = new ArrayList<>();
             if (userNames != null) {
-                for (User user:userNames) {
+                for (User user : userNames) {
                     stringUserNames.add(user.getUserName());
                 }
             }

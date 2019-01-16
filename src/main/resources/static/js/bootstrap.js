@@ -1080,7 +1080,7 @@
                 delta = offset.left * -2
                 offset.left = 0
 
-        $tip.offset(offset)
+                $tip.offset(offset)
 
                 actualWidth = $tip[0].offsetWidth
                 actualHeight = $tip[0].offsetHeight
@@ -1134,7 +1134,7 @@
 
     Tooltip.prototype.fixTitle = function () {
         var $e = this.$element
-        if ($e.attr('title') || typeof($e.attr('data-original-title')) != 'string') {
+        if ($e.attr('title') || typeof ($e.attr('data-original-title')) != 'string') {
             $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
         }
     }

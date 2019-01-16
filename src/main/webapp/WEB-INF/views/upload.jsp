@@ -7,15 +7,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<script type="javascript">
-    function uploadCount() {
-        //if(uplID == "uploadFormControlFile1")
-        // document.getElementById('newCount').value = document.getElementById('uploadBtn1').files.length;
-        alert(321);
-        // var a = document.getElementsByTagName('newCount').length;
 
-    }
-</script>
 
 <%@ include file="header.jsp" %>
 <title>Upload page</title>
@@ -40,20 +32,10 @@
                                 var badge = document.getElementById("badge1");
                                 badge.innerHTML = label.files.length;
                             });
-                            // function countFiles() {
-                            //
-                            //     var fileData = document.getElementsByName("fileData");
-                            //     var badge = document.getElementsByName("badge1");
-                            //     alert(badge.);
-                            //     return false;
-                            // }
+
                         </script>
                     </td>
                     <td>
-
-                        <%--<input type="text" name="filedescription" class="form-control"--%>
-                        <%--placeholder="Description"> --%>
-
                         <div class="input-group">
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-font"></span>
