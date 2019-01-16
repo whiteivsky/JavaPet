@@ -5,7 +5,7 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 
-<!--<%@ include file="header.jsp" %>-->
+<%@ include file="header.jsp" %>
 <h2>Create a new user</h2>
 
 <div>
