@@ -1,3 +1,5 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<sec:authentication var="user" property="principal"/>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,12 +38,16 @@
                         <li ${isActiveDownload}><A HREF="/download">home</a></li>
                         <li ${isActiveUpload}><A HREF="/upload">upload</a></li>
                         <li ${isActiveGroup}><A HREF="/groups">groups</a></li>
+                        <sec:authorize access="hasRole('ROLE_ADMIN')">
+                            <li ${isActiveGroup}><A HREF="/icons">icons</a></li>
+                            <li ${isActiveGroup}><A HREF="/admin">admin</a></li>
+                        </sec:authorize>
                     </ul>
                     <div class="navbar-right">
                         <ul class="nav nav nav-pills navbar-nav navbar-left">
-                        <p class="navbar-text">You signed in as ${pageContext.request.userPrincipal.name}</p>
+                            <p class="navbar-text">You signed in as ${pageContext.request.userPrincipal.name}</p>
                             <li class="active"><A HREF="/logout">out</a></li>
-                        <%--<button type="button" class="btn btn-default navbar-btn" onClick='location.href="/logout"'>out</button>--%>
+                                <%--<button type="button" class="btn btn-default navbar-btn" onClick='location.href="/logout"'>out</button>--%>
                         </ul>
                     </div>
                 </div>
@@ -58,4 +64,5 @@
         </c:choose>
     </div>
 </div>
-<c:if test="${registrationStatus != null}">${registrationStatus}</c:if>
+
+    <c:if test="${registrationStatus != null}">${registrationStatus}</c:if>

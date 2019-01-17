@@ -22,9 +22,6 @@ import java.io.File;
 @Log4j
 @Controller
 public class DownloadController {
-    private static final String PREFIX = "stream2file";
-    private static final String SUFFIX = ".tmp";
-
     @Autowired
     UserService userService;
     @Autowired
