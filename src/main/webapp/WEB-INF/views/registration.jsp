@@ -27,6 +27,4 @@
     </div>
     ${registrationStatus}
 </form>
-
-
 <%@ include file="footer.jsp" %>
