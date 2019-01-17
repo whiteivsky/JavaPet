@@ -29,8 +29,9 @@ public interface AttachMapper {
     @Select("SELECT * from attachments where owner_id = #{id}")
     List<Attach> selectAttachesByOwnerId(Integer id) throws Exception;
 
-    @Select("SELECT * FROM attachments left join attachments_groups on id=attachments_groups.attach_id where group_id = #{id}")
     @ResultMap("attachmentMap")
+    @Select("SELECT * FROM attachments left join attachments_groups on id=attachments_groups.attach_id where group_id = #{id}")
+
     List<Attach> selectAttachesByGroupId(Integer id) throws Exception;
 
     @Select("SELECT * from attachments where ID = #{id}")

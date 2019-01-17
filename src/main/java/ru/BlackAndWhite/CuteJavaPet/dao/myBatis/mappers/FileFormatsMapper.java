@@ -13,6 +13,7 @@ public interface FileFormatsMapper {
     @Options(useGeneratedKeys = true)
     void save(FileFormat format);
 
+
     @Select("SELECT * FROM fileformats ORDER BY name ASC")
     List<FileFormat> getAllIcons();
 

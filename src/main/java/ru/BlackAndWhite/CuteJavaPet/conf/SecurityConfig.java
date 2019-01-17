@@ -37,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(new String[]{"/", "/registration"})
                 .permitAll()
+                .antMatchers("/admin", "/icons", "/uploadIcons")
+                .access("hasRole('ROLE_ADMIN')")
                 .anyRequest()
                 .authenticated()
                 .and()
