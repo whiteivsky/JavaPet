@@ -10,14 +10,13 @@ import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.GroupService;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Log4j
 public class GroupServiceImpl implements GroupService {
-    final
-    GroupDAO groupDAO;
+    final private GroupDAO groupDAO;
 
     @Autowired
     UserDAO userDAO;
@@ -99,62 +98,48 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void replaceGroupsOfUser(User user, List<Group> groupList) {
         List<Group> userGroupList = groupDAO.selectGroupsByUserId(user.getId());
-        if (userGroupList == null) {
-            //log.info("No one group has been loaded");
-            return;
-        }
-        if (groupList == null) {
-            //log.info("No one group has been selected - delete all");
+        if (userGroupList == null) return;    //No one group has been loaded
+        if (groupList == null) {              //No one group has been selected - delete all
             delUserFromGroups(user, userGroupList);
             return;
         }
-
-        if (groupList.size() == userGroupList.size()) {
-            groupList.sort(Comparator.comparing(Group::getId));
-            userGroupList.sort(Comparator.comparing(Group::getId));
-            for (int i = 1; i < groupList.size(); i++) {
-                if (!(groupList.get(i).equals(userGroupList.get(i)))) {
-                    //log.info("Group lists were not same - delete all groups and add selected");
-                    delUserFromGroups(user, userGroupList);
-                    addUserToGroups(user, groupList);
-                    break;
-                }
-            }
-        } else {
-           // log.info("Group lists were not same - delete all groups and add selected");
+        if ((groupList.size() != userGroupList.size()) ||
+                (!userGroupList.containsAll(groupList))) {
             delUserFromGroups(user, userGroupList);
             addUserToGroups(user, groupList);
         }
     }
 
     public Object setNewGroupListToUser(String[] applyGroupList, String newGroupName, User currentLoggedUser) {
-        Object status = new ArrayList<>();
-        if (applyGroupList != null) {
-            List<Group> selectedGroupList = new ArrayList<>();
-            for (int i = 0; i < applyGroupList.length; i++) {
-                selectedGroupList.add(groupDAO.selectGroupByName(applyGroupList[i]));
-
-            }
-            //selectedGroupList.forEach(log::info);
-            // Change user`s groups to selected
-            if (selectedGroupList.size() != 0) {
-                replaceGroupsOfUser(
-                        currentLoggedUser, selectedGroupList);
-                ((ArrayList) status).addAll(selectedGroupList);
-            }
-        } else {
+        List<String> status = new ArrayList<>();
+        if (applyGroupList == null) {
             // The array is empty, remove user groups
             replaceGroupsOfUser(
                     currentLoggedUser, null);
-            ((ArrayList) status).add("all groups were deleted");
+            status.add("all groups were deleted");
+            return status;
         }
+        List<Group> selectedGroupList = Stream.of(applyGroupList)
+                .collect(
+                        () -> new ArrayList<>(),
+                        (list, item) -> list.add(groupDAO.selectGroupByName(item)),
+                        (list1, list2) -> list1.addAll(list2));
+
+        replaceGroupsOfUser(
+                currentLoggedUser, selectedGroupList);
+        ((ArrayList) status).addAll(selectedGroupList);
+
         // working with new group
+        addNewGroupToUser(newGroupName, currentLoggedUser, (ArrayList) status);
+        return status;
+    }
+
+    private void addNewGroupToUser(String newGroupName, User currentLoggedUser, ArrayList status) {
         if (!newGroupName.equals("")) {
             createGroup(newGroupName);
             addUserToGroup(currentLoggedUser,
                     groupDAO.selectGroupByName(newGroupName));
-            ((ArrayList) status).add("add new group '" + newGroupName + "'");
+            status.add("add new group '" + newGroupName + "'");
         }
-        return status;
     }
 }

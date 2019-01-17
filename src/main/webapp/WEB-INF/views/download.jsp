@@ -41,7 +41,7 @@
                                 <tr>
                                     <td><a href="<c:url value='/download/${attaches.id}' />">${attaches.fileName}</a>
                                     </td>
-                                    <td>${attaches.size}</td>
+                                    <td>${attaches.formatSize}</td>
                                     <td>${attaches.uploadDate.toLocaleString()}</td>
                                     <td>${attaches.owner.userName}</td>
                                     <td>${attaches.description}</td>
@@ -55,8 +55,6 @@
             </div>
         </c:otherwise>
     </c:choose>
-
-
 </div>
 
 
