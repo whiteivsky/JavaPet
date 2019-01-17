@@ -39,7 +39,7 @@ public class Attach {
         this.fileName = fileData.getOriginalFilename();
     }
 
-    public String getSize() {
+    public String getFormatSize() {
         boolean si = false;
         int unit = 1024;
         if ( this.size==0) return "0 B";

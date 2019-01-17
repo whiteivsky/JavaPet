@@ -34,7 +34,8 @@ public class UploadController {
 
         List<FileFormat> fileFormats = fileFormatService.selectIcons();
 
-        model.addAttribute("formats", fileFormats.stream().map(x -> "." + x.getName()).collect(Collectors.joining(",")));
+        model.addAttribute("formats", fileFormats.stream().map(x -> "." + x.getName())
+                .collect(Collectors.joining(",")));
         return model.addAttribute("isActiveUpload", "class=\"active\"");
     }
 
@@ -44,7 +45,8 @@ public class UploadController {
                                   Model curModel) {
         List<FileFormat> fileFormats = fileFormatService.selectIcons();
 
-        curModel.addAttribute("formats", fileFormats.stream().map(x -> "." + x.getName()).collect(Collectors.joining(",")));
+        curModel.addAttribute("formats", fileFormats.stream().map(x -> "." + x.getName())
+                .collect(Collectors.joining(",")));
         return curModel.addAttribute("uploadStatuses",
                 attachmentService.saveAttachments(filedescription, files));
     }
