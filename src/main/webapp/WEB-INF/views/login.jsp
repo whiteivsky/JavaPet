@@ -20,6 +20,7 @@
         <button class="btn btn-lg btn-primary btn-block" type="submit">Log In</button>
     </div>
 </form>
+
 <%@ include file="footer.jsp" %>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

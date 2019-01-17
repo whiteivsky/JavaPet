@@ -25,7 +25,6 @@
             <input type="submit" class="btn btn-default" value="registration">
         </div>
     </div>
-
     ${registrationStatus}
 </form>
 
