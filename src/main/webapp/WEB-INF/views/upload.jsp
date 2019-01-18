@@ -27,7 +27,6 @@
                         <script>
                             var label = document.querySelector("input");
                             label.addEventListener("change", function () {
-                                console.log("Кнопка нажата.");
                                 var badge = document.getElementById("badge1");
                                 badge.innerHTML = label.files.length;
                             });
