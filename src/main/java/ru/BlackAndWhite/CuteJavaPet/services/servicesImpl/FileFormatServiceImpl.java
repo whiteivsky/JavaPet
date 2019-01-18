@@ -24,6 +24,7 @@ public class FileFormatServiceImpl implements FileFormatService {
     public List<String> save(MultipartFile[] files) {
 
         List<String> uploadStatuses = new ArrayList<>();
+        if (files == null) return null;
 
         for (MultipartFile fileData : files) {
             if (!fileData.isEmpty()) {
@@ -35,7 +36,7 @@ public class FileFormatServiceImpl implements FileFormatService {
 
                     FileFormat format = new FileFormat();
 //                    format.setIcon(fileData.getInputStream());
-                    byte[] encodeBase64 = Base64.encodeBase64( fileData.getBytes());
+                    byte[] encodeBase64 = Base64.encodeBase64(fileData.getBytes());
                     String base64Encoded = null;
                     try {
                         base64Encoded = new String(encodeBase64, "UTF-8");
@@ -57,7 +58,7 @@ public class FileFormatServiceImpl implements FileFormatService {
                 uploadStatuses.add("Error! '" + fileData.getOriginalFilename() + "' is empty");
             }
         }
-          return  uploadStatuses;
+        return uploadStatuses;
     }
 
     @Override
@@ -68,5 +69,9 @@ public class FileFormatServiceImpl implements FileFormatService {
     @Override
     public List<FileFormat> selectIcons() {
         return fileFormatDAO.getAllIcons();
+    }
+
+    public void deleteIconByFilename(String name) {
+        fileFormatDAO.deleteIconByFilename(name);
     }
 }

@@ -45,7 +45,7 @@ public class Attach {
         if ( this.size==0) return "0 B";
         if ( this.size < unit) return  this.size + " B";
         int exp = (int) (Math.log (this.size) / Math.log(unit));
-        String pre = ("KMGTPE").charAt(exp - 1) + ("i");
+        String pre = ("KMGTPE").charAt(exp - 1) + ("");
         return String.format("%.1f %sB",  this.size / Math.pow(unit, exp), pre);
     }
 

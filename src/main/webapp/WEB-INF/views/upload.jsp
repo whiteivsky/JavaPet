@@ -26,7 +26,6 @@
                         </label>
                         <script>
                             var label = document.querySelector("input");
-
                             label.addEventListener("change", function () {
                                 console.log("Кнопка нажата.");
                                 var badge = document.getElementById("badge1");
@@ -55,13 +54,13 @@
             files!
         </div>
         <div class="panel-footer">
-
             <c:forEach var="uploadStatuses" items="${uploadStatuses}">
                 <!-- Тут нужно вставить обработчик статусов для парсинга дизайна-->
                 <div class="alert alert-warning">
                         ${uploadStatuses} </div>
             </c:forEach>
         </div>
+    </div>
 </form>
 
 </div>

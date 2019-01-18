@@ -10,4 +10,6 @@ public interface FileFormatDAO {
     FileFormat getIconByFilename(String fileName);
 
     List<FileFormat> getAllIcons();
+
+    void deleteIconByFilename(String name);
 }

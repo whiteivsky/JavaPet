@@ -23,12 +23,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping(path = "admin")
-    public String admin(Model model) {
-        model.addAttribute("isActive", "class=\"active\"");
-        return "admin";
-    }
-
     @GetMapping(path = "registration")
     public Model registration(Model model) {
         return model;

@@ -7,20 +7,20 @@
 <%@ include file="header.jsp" %>
 <meta charset="utf-8">
 
-    <table>
-        <c:forEach var="icons" items="${icons}">
-            <tr>
-                <td>${icons.name}</td>
-                <td>
-                    <img src="data:image/png;base64,${icons.icon}" width="46"
-                         height="46" alt="img" />
-                    </td>
-                <%--<td><a href="<c:url value='/download/${attaches.id}' />">${attaches.fileName}</a></td>--%>
-            </tr>
-        </c:forEach>
+<%--<table>--%>
+<%--<c:forEach var="icons" items="${icons}">--%>
+<%--<tr>--%>
+<%--<td>${icons.name}</td>--%>
+<%--<td>--%>
+<%--<img src="data:image/png;base64,${icons.icon}" width="46"--%>
+<%--height="46" alt="img" />--%>
+<%--</td>--%>
+<%--&lt;%&ndash;<td><a href="<c:url value='/download/${attaches.id}' />">${attaches.fileName}</a></td>&ndash;%&gt;--%>
+<%--</tr>--%>
+<%--</c:forEach>--%>
 
-    </table>
-<form method="get" action="${contextPath}/uploadIcons">
-    <button type="submit">Add icons</button>
-</form>
+<%--</table>--%>
+<%--<form method="get" action="${contextPath}/uploadIcons">--%>
+<%--<button type="submit">Add icons</button>--%>
+<%--</form>--%>
 <%@ include file="footer.jsp" %>
