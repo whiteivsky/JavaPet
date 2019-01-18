@@ -9,13 +9,23 @@
                 <div class="btn-group">
                     <label class="btn btn-default">
                     <span class="glyphicon glyphicon glyphicon-plus">
-                        <input type="file" name="newIcons" accept=".png" multiple style="display: none;">
+                        <input type="file" id="newIcons" name="newIcons" accept=".png" multiple style="display: none;">
                     </span>Select
                     </label>
                     <label class="btn btn-primary">Upload
                         <span class="glyphicon glyphicon-upload">
                             <input type="submit" value="Upload" style="display: none;">
                         </span>
+                        <script>
+                            var fileInput = document.querySelector("input");
+
+                            fileInput.addEventListener("change", function () {
+                                var badge = document.getElementById("badge1");
+                                badge.innerHTML = fileInput.files.length;
+                            });
+
+                        </script>
+                        <span class="badge" id="badge1"></span>
                     </label>
                 </div>
                 <br>
