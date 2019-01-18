@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 @Log4j
 @Controller
 public class CustomErrorController extends AbstractErrorController {
-    private static final String ERROR_PATH = "/error";
+    private static final String ERROR_PATH = "error";
 
     @Autowired
     public CustomErrorController(ErrorAttributes errorAttributes) {

@@ -11,4 +11,6 @@ public interface FileFormatService {
     FileFormat getIconByExt(String fileName);
 
     List<FileFormat> selectIcons();
+
+    void deleteIconByFilename(String name);
 }

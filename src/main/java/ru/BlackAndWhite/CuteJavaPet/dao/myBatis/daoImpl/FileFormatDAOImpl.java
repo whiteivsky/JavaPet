@@ -46,4 +46,9 @@ public class FileFormatDAOImpl implements FileFormatDAO {
         sqlSession.commit();
         return fileFormat;
     }
+
+    public void deleteIconByFilename(String name) {
+        sqlSession.getMapper(FileFormatsMapper.class).deleteIconByFilename(name);
+        sqlSession.commit();
+    }
 }

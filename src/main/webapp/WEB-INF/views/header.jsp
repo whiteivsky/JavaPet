@@ -1,4 +1,5 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <sec:authentication var="user" property="principal"/>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,27 +22,26 @@
 <body>
 <%--<%@ include file="header.jsp" %>--%>
 <div class="container">
-<div class="navbar navbar-default" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <A class="navbar-brand" HREF="/">JavaPet</a>
-        </div>
-        <c:choose>
-            <c:when test="${pageContext.request.userPrincipal.name != null}">
+    <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <A class="navbar-brand" HREF="/">JavaPet</a>
+            </div>
+
+            <c:if test="${pageContext.request.userPrincipal.name != null}">
                 <div class="collapse navbar-collapse ">
                     <ul class="nav navbar-nav navbar-left">
-                        <li ${isActiveDownload}><A HREF="/download">home</a></li>
-                        <li ${isActiveUpload}><A HREF="/upload">upload</a></li>
-                        <li ${isActiveGroup}><A HREF="/groups">groups</a></li>
+                        <li ${isActiveDownload}><A HREF="download">home</a></li>
+                        <li ${isActiveUpload}><A HREF="upload">upload</a></li>
+                        <li ${isActiveGroup}><A HREF="groups">groups</a></li>
                         <sec:authorize access="hasRole('ROLE_ADMIN')">
-                            <li ${isActiveGroup}><A HREF="/icons">icons</a></li>
-                            <li ${isActiveGroup}><A HREF="/admin">admin</a></li>
+                            <li ${isActiveAdmin}><A HREF="admin">admin</a></li>
                         </sec:authorize>
                     </ul>
                     <div class="navbar-right">
@@ -52,18 +52,16 @@
                         </ul>
                     </div>
                 </div>
-
-            </c:when>
-            <c:otherwise>
+            </c:if>
+            <c:if test="${pageContext.request.userPrincipal.name == null}">
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li><A HREF="/login">login</a></li>
                         <li><A HREF="/registration">registration</a></li>
                     </ul>
                 </div>
-            </c:otherwise>
-        </c:choose>
+            </c:if>
+        </div>
     </div>
-</div>
 
-    <c:if test="${registrationStatus != null}">${registrationStatus}</c:if>
+    <%--<c:if test="${registrationStatus != null}">${registrationStatus}</c:if>--%>

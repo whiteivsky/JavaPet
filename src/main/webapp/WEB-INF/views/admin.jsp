@@ -1,80 +1,66 @@
+<%@ include file="header.jsp" %>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
-    <title>Static Top Navbar Example for Bootstrap</title>
+<div class="panel panel-default">
+    <div class="panel-heading">Icons</div>
+    <div class="panel-body">
+        <div class="input-group">
+            <form method="POST" enctype="multipart/form-data" action="${contextPath}/uploadIcons">
 
-    <link href="css/bootstrap.css" rel="stylesheet">
-
-    <link href="navbar-static-top.css" rel="stylesheet">
-
-    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-
-    <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-</head>
-<body>
-
-<div class="navbar navbar-default navbar-static-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Project name</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Nav header</li>
-                        <li><a href="#">Separated link</a></li>
-                        <li><a href="#">One more separated link</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="../navbar/">Default</a></li>
-                <li class="active"><a href="./">Static top</a></li>
-                <li><a href="../navbar-fixed-top/">Fixed top</a></li>
-            </ul>
+                <div class="btn-group">
+                    <label class="btn btn-default">
+                    <span class="glyphicon glyphicon glyphicon-plus">
+                        <input type="file" name="newIcons" accept=".png" multiple style="display: none;">
+                    </span>Select
+                    </label>
+                    <label class="btn btn-primary">Upload
+                        <span class="glyphicon glyphicon-upload">
+                            <input type="submit" value="Upload" style="display: none;">
+                        </span>
+                    </label>
+                </div>
+                <br>
+                <div class="container">
+                    <div class="row">
+                        <c:forEach var="uploadStatuses" items="${uploadStatuses}">
+                    <span class="label label-info">
+                            ${uploadStatuses}
+                    </span>
+                        </c:forEach>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-</div>
-<div class="container">
-
-    <div class="jumbotron">
-        <h1>Navbar example</h1>
-        <p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It
-            includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>
-        <p>To see the difference between static and fixed top navbars, just scroll.</p>
-        <p>
-            <a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>
-        </p>
+    <div class="panel-footer">
+        <FORM NAME="deleteForm" METHOD="POST" action="${contextPath}/deleteIcons">
+            <INPUT TYPE="hidden" name="iconForDelete" id="iconForDelete">
+            <div class="row">
+                <c:forEach var="icons" items="${icons}">
+                    <div class="col-sm-1 col-md-1" style="padding-left: 5px; padding-right: 5px;">
+                        <div class="thumbnail">
+                            <img src="data:image/png;base64,${icons.icon}" width="46"
+                                 height="46" alt="img"/>
+                            <div class="caption">
+                                <h4>*.${icons.name}</h4>
+                            </div>
+                            <SCRIPT LANGUAGE="JavaScript">
+                                function deleteIconByName(iconName) {
+                                    document.getElementById("iconForDelete").value = iconName;
+                                    var user = document.getElementById("iconForDelete").value;
+                                    var x = document.getElementsByName('deleteForm');
+                                    x[0].submit();
+                                    return "";
+                                }
+                            </SCRIPT>
+                            <button type="button" class="btn btn-block btn-primary"
+                                    ONCLICK="deleteIconByName('${icons.name}');">
+                                <span class="glyphicon  glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
+        </FORM>
     </div>
 </div>
-
-
-<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-</body>
-</html>
+<%@ include file="footer.jsp" %>
