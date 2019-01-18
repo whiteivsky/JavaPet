@@ -63,6 +63,7 @@ public class FileFormatServiceImpl implements FileFormatService {
 
     @Override
     public FileFormat getIconByExt(String fileName) {
+
         return fileFormatDAO.getIconByFilename(fileName);
     }
 

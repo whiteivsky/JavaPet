@@ -1,6 +1,5 @@
 package ru.BlackAndWhite.CuteJavaPet.services.servicesImpl;
 
-import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -10,14 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.AttachDAO;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.GroupDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.Attach;
-import ru.BlackAndWhite.CuteJavaPet.model.Group;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.AttachmentService;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,6 +47,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private String saveAttach(String fileDescription, MultipartFile fileData) {
+
         if (fileData.isEmpty())
             return env.getProperty("empty") + "'" + fileData.getOriginalFilename() + "' is empty";
         if (fileFormatService.getIconByExt(fileData.getOriginalFilename()) == null)

@@ -1,5 +1,6 @@
 package ru.BlackAndWhite.CuteJavaPet.controllers;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,7 +20,7 @@ public class DownloadControllerTest {
 
     @Test
     public void showDownloadFileForm() {
-
+        Assert.assertTrue(true);
 
     }
 
