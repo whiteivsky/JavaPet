@@ -34,10 +34,15 @@ public class UserController {
                                      @RequestParam("password") String password,
                                      @RequestParam("confirmPassword") String confirmPassword,
                                      Model model) {
-        return new ModelAndView("download")
-                .addAllObjects(model.asMap())
-                .addObject("registrationStatus",
-                        userService.userRegistration(userName, email, password, confirmPassword));
+        Object registrationStatus = userService.userRegistration(userName, email, password, confirmPassword);
+        if (registrationStatus == null)
+            return new ModelAndView("download")
+                    .addAllObjects(model.asMap())
+                    .addObject("registrationStatus", "Success registration");
+        else
+            return new ModelAndView("registration")
+                    .addAllObjects(model.asMap())
+                    .addObject("registrationStatus", registrationStatus);
     }
 
     @GetMapping(path = "login")
