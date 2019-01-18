@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public class RoleDAOImpl implements RoleDAO {//extends JpaRepository<Role, Long> {
-    private static String DEFAULT_ROLE = "user";
+    private static String DEFAULT_ROLE = "ROLE_USER";
 //    @Autowired
 //    JdbcTemplate jdbcTemplate;
     @Autowired
