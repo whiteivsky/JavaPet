@@ -19,11 +19,14 @@ import ru.BlackAndWhite.CuteJavaPet.common.CreateThings;
 import ru.BlackAndWhite.CuteJavaPet.common.ServiceTestConfig;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.AttachDAO;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.GroupDAO;
+import ru.BlackAndWhite.CuteJavaPet.model.Attach;
+import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.AttachmentServiceImpl;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.FileFormatServiceImpl;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -58,12 +61,7 @@ public class AttachmentIntegrationTest {
     }
 
     @Test
-    public void saveAttachTest() throws Exception {
-                /*	@Test
-	public void testFindTheGreatestFromAllData_ForOneValue() {
-		when(dataServiceMock.retrieveAllData()).thenReturn(new int[] { 15 });
-		assertEquals(15, businessImpl.findTheGreatestFromAllData());*/
-
+    public void saveAttachmentsTest() throws Exception {
         MultipartFile[] files = CreateThings.newMultipartFileArray(
                 new String[]{"normal", "empty", "wrong"},
                 new String[]{"doc", "docx", "wrg"},
@@ -86,7 +84,6 @@ public class AttachmentIntegrationTest {
         Assert.assertTrue("error" + env.getProperty("empty"), statuses.get(1).startsWith(env.getProperty("empty")));
         Assert.assertTrue("error" + env.getProperty("wrongFormat"), statuses.get(2).startsWith(env.getProperty("wrongFormat")));
 
-
         try {
             Assert.assertNotNull(attachmentService.saveAttachments("testDescr", null));
         } catch (NullPointerException e) {
@@ -96,10 +93,23 @@ public class AttachmentIntegrationTest {
 
     @Test
     public void selectAttachmentByIDTest() throws Exception {
-
-
         when(attachDAO.selectAttachByID(1)).thenReturn(CreateThings.newAttach(1));
         Assert.assertEquals(CreateThings.newAttach(1), attachmentService.selectAttachmentByID(1));
+    }
+
+    @Test
+    public void selectAttachmentsbyUserTest() throws Exception {
+        User user = CreateThings.newUser();
+        List<Attach> attachList = new ArrayList<>();
+        attachList.add(CreateThings.newAttach());
+        attachList.add(CreateThings.newAttach());
+        attachList.add(CreateThings.newAttach());
+        when(attachDAO.selectAttachesbyUser(user))
+                .thenReturn(attachList);
+        List<Attach> attachListTest = attachmentService.selectAttachmentsbyUser(user);
+        Assert.assertNotNull(attachListTest);
+        Assert.assertEquals(3, attachListTest.size());
+        Assert.assertEquals(attachList, attachListTest);
 
     }
 }

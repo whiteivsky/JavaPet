@@ -37,10 +37,6 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public List<String> saveAttachments(String filedescription, MultipartFile[] files) {
-//        List<String> uploadStatuses = new ArrayList<>();
-//        for (MultipartFile fileData : files) {
-//            uploadStatuses.add(saveAttach(filedescription, fileData));
-//        }
         return Arrays.stream(files)
                 .map(multipartFile -> saveAttach(filedescription, multipartFile))
                 .collect(Collectors.toList());
@@ -56,7 +52,6 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private String someSave(String fileDescription, MultipartFile fileData) {
-        //String uploadStatuses;
         try {
             Attach uploadAttachment = getAttach(fileDescription, fileData);
             attachDAO.saveAttach(uploadAttachment);
@@ -67,7 +62,6 @@ public class AttachmentServiceImpl implements AttachmentService {
             log.error(e);
            return e.getLocalizedMessage();
         }
-        //return uploadStatuses;
     }
 
     private Attach getAttach(String fileDescription, MultipartFile fileData) throws IOException {
@@ -89,43 +83,4 @@ public class AttachmentServiceImpl implements AttachmentService {
     public Attach selectAttachmentByID(int id) throws Exception {
         return attachDAO.selectAttachByID(id);
     }
-
-
-//    @Override
-//    public List<Attach> selectAttachmentsByUserID(int id) throws Exception {
-//        return attachDAO.selectAttachesByID(id);
-//    }
-//
-//    @Override
-//    public void addAttachmentGroups(Attach attach, List<Group> groupSet) {
-//        if ((groupSet != null) & (attach != null)) {
-//            groupSet.forEach(curGroup -> {
-//                try {
-//                    attachDAO.addAttachGroup(attach, curGroup);
-//                } catch (Exception e) {
-//                    log.error(e);
-//                }
-//            });
-//        }
-//    }
-//    private void saveAttach(Attach attach) {
-//        try {
-//            attach.setOwner(userService.getCurrentLoggedUser());
-//            attachDAO.saveAttach(attach);
-//            attachDAO.addAttachGroups(attach,
-//                    groupDAO.selectGroupsByUserId(attach.getOwner().getId()));
-//        } catch (Exception e) {
-//            log.error(e);
-//        }
-//    }
-//
-//    private Attach setAttach(String filedescription, MultipartFile fileData) throws IOException {
-//        Attach uploadAttachment = new Attach();
-//        uploadAttachment.setMediaType(fileData.getContentType());
-//        uploadAttachment.setMultiPartFileData(fileData);
-//        uploadAttachment.setDescription(filedescription);
-//        uploadAttachment.setFileName(fileData.getOriginalFilename());
-//        uploadAttachment.setOwner(userService.getCurrentLoggedUser());
-//        return uploadAttachment;
-//    }
 }
