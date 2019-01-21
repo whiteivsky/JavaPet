@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             return e;
         }
-        return "Success registration";
+        return null;
     }
 
     @Override

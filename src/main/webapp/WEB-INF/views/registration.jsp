@@ -25,6 +25,9 @@
             <input type="submit" class="btn btn-default" value="registration">
         </div>
     </div>
-    ${registrationStatus}
+    <c:if test="${registrationStatus!=null}">
+        <div class="alert alert-danger">${registrationStatus}</div>
+    </c:if>
+
 </form>
 <%@ include file="footer.jsp" %>

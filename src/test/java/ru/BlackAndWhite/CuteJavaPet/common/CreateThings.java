@@ -1,26 +1,33 @@
 package ru.BlackAndWhite.CuteJavaPet.common;
 
 import lombok.extern.log4j.Log4j;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.model.Attach;
+import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.model.Group;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
 
 import java.io.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Log4j
 public class CreateThings {
 
 
-    public static MultipartFile[] newMultipartFileArray() throws IOException {
-        MultipartFile[] mpArray = new MultipartFile[3];
-        // first - isNormal,
-        mpArray[0] = newMultipartFile(generateFile("normal","doc",false));
-        // second - isEmpty,
-        mpArray[1] = newMultipartFile(generateFile("empty","doc",true));
-        // third - isWrongExt
-        mpArray[2] = newMultipartFile(generateFile("wrong ext","wrg",false));
+    public static MultipartFile[] newMultipartFileArray(String[] name, String[] ext, boolean[] empty) throws IOException {
+        MultipartFile[] mpArray = new MultipartFile[name.length];
+        for (int i = 0; i < name.length; i++) {
+            mpArray[i] = newMultipartFile(generateFile(name[i], ext[i], empty[i]));
+        }
+//        // first - isNormal,
+//
+//
+//        mpArray[1] = newMultipartFile(generateFile("empty", "doc", true));
+//        // third - isWrongExt
+//        mpArray[2] = newMultipartFile(generateFile("wrong ext", "wrg", false));
         return mpArray;
     }
 
@@ -33,6 +40,7 @@ public class CreateThings {
 
             @Override
             public String getOriginalFilename() {
+
                 return newFile.getName();
             }
 
@@ -43,7 +51,7 @@ public class CreateThings {
 
             @Override
             public boolean isEmpty() {
-                return false;
+                return newFile.length() == 0;
             }
 
             @Override
@@ -95,6 +103,12 @@ public class CreateThings {
         return newGroup;
     }
 
+    public static List<Group> newGroupList(int listSize) {
+        List<Group> groups = IntStream.range(0, listSize)
+                .mapToObj(i -> CreateThings.newGroup()).collect(Collectors.toList());
+        return groups;
+    }
+
     public static Attach newAttach(Integer id) {
         Attach newAttach = newAttach();
         newAttach.setId(id);
@@ -105,7 +119,7 @@ public class CreateThings {
         Attach newAttach = new Attach();
         File tmpfile = null;
         try {
-            tmpfile = generateFile("newFile","txt",false);
+            tmpfile = generateFile("newFile", "txt", false);
         } catch (IOException e) {
             log.error(e);
         }
@@ -129,8 +143,29 @@ public class CreateThings {
         return newAttach;
     }
 
+    public static FileFormat newFileFormat(MultipartFile fileData) throws Exception {
+        FileFormat format = new FileFormat();
+        byte[] encodeBase64 = Base64.encodeBase64(fileData.getBytes());
+        String base64Encoded = null;
+        try {
+            base64Encoded = new String(encodeBase64, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        format.setIcon(base64Encoded);
+        format.setMediaType(fileData.getContentType());
+//        log.info("setName = " + fileData.getName().substring(fileData.getName().lastIndexOf(".")+1));
+        format.setName(fileData.getName().substring(fileData.getName().indexOf(".")));
+        return format;
+    }
+
+    public static FileFormat newFileFormat(String filename, String ext, boolean isEmpty) throws Exception {
+        MultipartFile fileData = newMultipartFile(generateFile(filename, ext, isEmpty));
+        return newFileFormat(fileData);
+    }
+
     private static File generateFile(String filename, String ext, boolean isEmpty) throws IOException {
-        final File tempFile = File.createTempFile(filename, ext);
+        final File tempFile = File.createTempFile(filename, "." + ext);
         tempFile.deleteOnExit();
         OutputStream is = new FileOutputStream(tempFile);
         if (!isEmpty) {
