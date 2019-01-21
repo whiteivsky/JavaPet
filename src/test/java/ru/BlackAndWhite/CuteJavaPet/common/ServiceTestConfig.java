@@ -11,7 +11,6 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Log4j
@@ -27,10 +26,11 @@ public class ServiceTestConfig {
     @Bean
     public DataSource dataSource() {
         DataSource dataSource = new DataSource();
-        dataSource.setUrl("jdbc:mysql://localhost:3306/javapettest?verifyServerCertificate=false&useSSL=false&requireSSL=false");
+        //dataSource.setUrl("jdbc:mysql://localhost:3306/javapettest?verifyServerCertificate=false&useSSL=false&requireSSL=false");
+        dataSource.setUrl("jdbc:h2:mem:testdb");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setDriverClassName("org.h2.Driver");
         return dataSource;
     }
 

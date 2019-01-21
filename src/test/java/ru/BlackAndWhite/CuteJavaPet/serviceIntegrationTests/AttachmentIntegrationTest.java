@@ -34,10 +34,6 @@ import static org.mockito.Mockito.when;
 
 @Log4j
 @PropertySource(value = {"classpath:/uploadStatuses.properties"})
-
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(classes = {ServiceTestConfig.class})
-//
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ServiceTestConfig.class})
 public class AttachmentIntegrationTest {
