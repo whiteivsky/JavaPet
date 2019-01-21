@@ -9,6 +9,8 @@ import ru.BlackAndWhite.CuteJavaPet.model.Group;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
 
 import java.io.*;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Log4j
@@ -99,6 +101,12 @@ public class CreateThings {
         Group newGroup = new Group();
         newGroup.setGroupName("testGroup");
         return newGroup;
+    }
+
+    public static List<Group> newGroupList(int listSize) {
+        List<Group> groups = IntStream.range(0, listSize)
+                .mapToObj(i -> CreateThings.newGroup()).collect(Collectors.toList());
+        return groups;
     }
 
     public static Attach newAttach(Integer id) {

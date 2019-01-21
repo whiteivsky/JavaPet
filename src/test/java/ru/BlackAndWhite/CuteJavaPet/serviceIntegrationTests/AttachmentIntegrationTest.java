@@ -2,6 +2,7 @@ package ru.BlackAndWhite.CuteJavaPet.serviceIntegrationTests;
 
 
 import lombok.extern.log4j.Log4j;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ServiceTestConfig.class})
 public class AttachmentIntegrationTest {
-    private static boolean isInitialized = false;
+
     @Mock
     AttachDAO attachDAO;
     @Mock
@@ -60,8 +61,8 @@ public class AttachmentIntegrationTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test
-    public void saveAttachmentsTest() throws Exception {
+    @NotNull
+    public MultipartFile[] setUpSaveAttachmentsTest() throws Exception {
         MultipartFile[] files = CreateThings.newMultipartFileArray(
                 new String[]{"normal", "empty", "wrong"},
                 new String[]{"doc", "docx", "wrg"},
@@ -69,8 +70,6 @@ public class AttachmentIntegrationTest {
         // first - isNormal,
         // second - isEmpty,
         // third - isWrongExt
-
-
         when(fileFormatService.getIconByExt(files[0].getOriginalFilename()))
                 .thenReturn(CreateThings.newFileFormat(files[0]));
         when(fileFormatService.getIconByExt(files[1].getOriginalFilename()))
@@ -78,12 +77,27 @@ public class AttachmentIntegrationTest {
         when(fileFormatService.getIconByExt(files[2].getOriginalFilename()))
                 .thenReturn(null);
 
-        when(userService.getCurrentLoggedUser()).thenReturn(CreateThings.newUser());
-        List<String> statuses = attachmentService.saveAttachments("allFiles", files);
-        Assert.assertTrue("error" + env.getProperty("success"), statuses.get(0).startsWith(env.getProperty("success")));
-        Assert.assertTrue("error" + env.getProperty("empty"), statuses.get(1).startsWith(env.getProperty("empty")));
-        Assert.assertTrue("error" + env.getProperty("wrongFormat"), statuses.get(2).startsWith(env.getProperty("wrongFormat")));
+        when(groupDAO.selectGroupsByUserId(1)).thenReturn(CreateThings.newGroupList(1));
+        when(userService.getCurrentLoggedUser()).thenReturn(CreateThings.newUser(1));
+        return files;
+    }
+    @Test
+    public void saveAttachmentsTest() {
+        try {
+            List<String> statuses = attachmentService.saveAttachments("allFiles", setUpSaveAttachmentsTest());
+            Assert.assertTrue("error" + env.getProperty("success"),
+                    statuses.get(0).startsWith(env.getProperty("success")));
+            Assert.assertTrue("error" + env.getProperty("empty"),
+                    statuses.get(1).startsWith(env.getProperty("empty")));
+            Assert.assertTrue("error" + env.getProperty("wrongFormat"),
+                    statuses.get(2).startsWith(env.getProperty("wrongFormat")));
+        } catch (Exception e) {
+            Assert.fail("Error in save attach" + e.getLocalizedMessage());
+        }
+    }
 
+    @Test
+    public void saveAttachmetsNullFilesTest() {
         try {
             Assert.assertNotNull(attachmentService.saveAttachments("testDescr", null));
         } catch (NullPointerException e) {
@@ -100,16 +114,21 @@ public class AttachmentIntegrationTest {
     @Test
     public void selectAttachmentsbyUserTest() throws Exception {
         User user = CreateThings.newUser();
+        List<Attach> attachList = setUpSelectAttachmentsbyUserTest(user);
+        List<Attach> attachListTest = attachmentService.selectAttachmentsbyUser(user);
+        Assert.assertNotNull(attachListTest);
+        Assert.assertEquals(3, attachListTest.size());
+        Assert.assertEquals(attachList, attachListTest);
+    }
+
+    @NotNull
+    public List<Attach> setUpSelectAttachmentsbyUserTest(User user) throws Exception {
         List<Attach> attachList = new ArrayList<>();
         attachList.add(CreateThings.newAttach());
         attachList.add(CreateThings.newAttach());
         attachList.add(CreateThings.newAttach());
         when(attachDAO.selectAttachesbyUser(user))
                 .thenReturn(attachList);
-        List<Attach> attachListTest = attachmentService.selectAttachmentsbyUser(user);
-        Assert.assertNotNull(attachListTest);
-        Assert.assertEquals(3, attachListTest.size());
-        Assert.assertEquals(attachList, attachListTest);
-
+        return attachList;
     }
 }
