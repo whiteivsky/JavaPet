@@ -66,13 +66,12 @@ public class AttachmentIntegrationTest {
         // first - isNormal,
         // second - isEmpty,
         // third - isWrongExt
-        when(fileFormatService.getIconByExt(files[0].getOriginalFilename()))
+        when(fileFormatService.getIconByFilename(files[0].getOriginalFilename()))
                 .thenReturn(CreateThings.newFileFormat(files[0]));
-        when(fileFormatService.getIconByExt(files[1].getOriginalFilename()))
+        when(fileFormatService.getIconByFilename(files[1].getOriginalFilename()))
                 .thenReturn(CreateThings.newFileFormat(files[1]));
-        when(fileFormatService.getIconByExt(files[2].getOriginalFilename()))
+        when(fileFormatService.getIconByFilename(files[2].getOriginalFilename()))
                 .thenReturn(null);
-
         when(groupDAO.selectGroupsByUserId(1)).thenReturn(CreateThings.newGroupList(1));
         when(userService.getCurrentLoggedUser()).thenReturn(CreateThings.newUser(1));
         return files;
@@ -88,7 +87,7 @@ public class AttachmentIntegrationTest {
             Assert.assertTrue("error" + env.getProperty("wrongFormat"),
                     statuses.get(2).startsWith(env.getProperty("wrongFormat")));
         } catch (Exception e) {
-            Assert.fail("Error in save attach" + e.getLocalizedMessage());
+            Assert.fail("Error in upload attach" + e.getLocalizedMessage());
         }
     }
 

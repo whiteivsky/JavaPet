@@ -8,7 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.FileFormatDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.services.FileFormatService;
+import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
+import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,57 +24,52 @@ public class FileFormatServiceImpl implements FileFormatService {
     FileFormatDAO fileFormatDAO;
 
     @Override
-    public List<String> save(MultipartFile[] files) {
-
+    public List<String> upload(MultipartFile[] files) {
         List<String> uploadStatuses = new ArrayList<>();
         if (files == null) return null;
-
         for (MultipartFile fileData : files) {
-            if (!fileData.isEmpty()) {
-                try {
-
-                    if (!fileData.getOriginalFilename().endsWith(".png")) {
-                        throw new Exception("Error! '" + fileData.getOriginalFilename() + "' doesn't end with .png");
-                    }
-
-                    FileFormat format = new FileFormat();
-//                    format.setIcon(fileData.getInputStream());
-                    byte[] encodeBase64 = Base64.encodeBase64(fileData.getBytes());
-                    String base64Encoded = null;
-                    try {
-                        base64Encoded = new String(encodeBase64, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                        throw new Exception("Error! '" + fileData.getOriginalFilename() + "' doesn't encode to Base64");
-                    }
-                    format.setIcon(base64Encoded);
-
-                    format.setMediaType(fileData.getContentType());
-                    format.setName(fileData.getOriginalFilename().replace(".png", ""));
-
-                    fileFormatDAO.save(format);
-                    uploadStatuses.add("'" + format.getName() + "' upload done");
-                } catch (Exception e) {
-                    uploadStatuses.add(e.getLocalizedMessage());
-                }
-            } else {
-                uploadStatuses.add("Error! '" + fileData.getOriginalFilename() + "' is empty");
-            }
+            uploadStatuses.add(fileParametersCheckAndSave(fileData));
         }
         return uploadStatuses;
     }
 
-    @Override
-    public FileFormat getIconByExt(String fileName) {
+    public String fileParametersCheckAndSave(MultipartFile fileData) {
+        if (fileData.isEmpty())
+            return UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, fileData.getOriginalFilename());
+        if (!fileData.getOriginalFilename().endsWith(".png"))
+            return UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, fileData.getOriginalFilename());
+        try {
+            fileFormatDAO.save(getFileFormat(fileData));
+            return UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, fileData.getOriginalFilename());
+        } catch (UnsupportedEncodingException e) {
+            return UploadStatusesWrapper.getStatus(UploadStatuses.BAD_ENCODE, fileData.getOriginalFilename());
+        } catch (Exception e) {
+            return e.getLocalizedMessage();
+            //todo Вставить обработчик неожиданных ошибок
+        }
+    }
 
+    public FileFormat getFileFormat(MultipartFile fileData) throws IOException {
+        FileFormat format = new FileFormat();
+        byte[] encodeBase64 = Base64.encodeBase64(fileData.getBytes());
+        String base64Encoded = new String(encodeBase64, "UTF-8");
+        format.setIcon(base64Encoded);
+        format.setMediaType(fileData.getContentType());
+        format.setName(fileData.getOriginalFilename().replace(".png", ""));
+        return format;
+    }
+
+    @Override
+    public FileFormat getIconByFilename(String fileName) {
         return fileFormatDAO.getIconByFilename(fileName);
     }
 
     @Override
-    public List<FileFormat> selectIcons() {
+    public List<FileFormat> getAllIcons() {
         return fileFormatDAO.getAllIcons();
     }
 
+    @Override
     public void deleteIconByFilename(String name) {
         fileFormatDAO.deleteIconByFilename(name);
     }

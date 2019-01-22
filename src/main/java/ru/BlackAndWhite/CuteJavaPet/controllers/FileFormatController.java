@@ -20,7 +20,7 @@ public class FileFormatController {
 
     @RequestMapping(path = {"admin", "uploadIcons"})
     public ModelAndView getViewIcons(ModelAndView model) {
-        model.addObject("icons", fileFormatService.selectIcons());
+        model.addObject("icons", fileFormatService.getAllIcons());
         model.addObject("isActiveAdmin", "class=\"active\"");
         model.setViewName("admin");
         return model;
@@ -29,7 +29,7 @@ public class FileFormatController {
     @PostMapping(path = "uploadIcons")
     public ModelAndView UploadIcons(@RequestParam("newIcons") MultipartFile[] files,
                                     ModelMap model) {
-        model.addAttribute("uploadStatuses", fileFormatService.save(files));
+        model.addAttribute("uploadStatuses", fileFormatService.upload(files));
         return new ModelAndView("forward:/admin", model);
     }
 

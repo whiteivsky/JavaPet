@@ -6,11 +6,11 @@ import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import java.util.List;
 
 public interface FileFormatService {
-    List<String> save(MultipartFile[] files);
+    List<String> upload(MultipartFile[] files);
 
-    FileFormat getIconByExt(String fileName);
+    FileFormat getIconByFilename(String fileName);
 
-    List<FileFormat> selectIcons();
+    List<FileFormat> getAllIcons();
 
     void deleteIconByFilename(String name);
 }
