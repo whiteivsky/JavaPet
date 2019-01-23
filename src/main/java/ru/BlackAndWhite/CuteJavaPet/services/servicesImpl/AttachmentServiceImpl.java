@@ -12,12 +12,13 @@ import ru.BlackAndWhite.CuteJavaPet.model.Attach;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.AttachmentService;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
+import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
+import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Log4j
 @Service
@@ -37,17 +38,22 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public List<String> saveAttachments(String filedescription, MultipartFile[] files) {
-        return Arrays.stream(files)
-                .map(multipartFile -> saveAttach(filedescription, multipartFile))
-                .collect(Collectors.toList());
+        List<String> list = new ArrayList<>();
+        for (MultipartFile multipartFile : files) {
+            String s = saveAttach(filedescription, multipartFile);
+            list.add(s);
+        }
+        return list;
     }
 
     private String saveAttach(String fileDescription, MultipartFile fileData) {
 
         if (fileData.isEmpty())
-            return env.getProperty("empty") + "'" + fileData.getOriginalFilename() + "' is empty";
-        if (fileFormatService.getIconByExt(fileData.getOriginalFilename()) == null)
-            return env.getProperty("wrongFormat") + "'" + fileData.getOriginalFilename() + "' have wrong format";
+            return UploadStatusesWrapper.getStatus(
+                    UploadStatuses.EMPTY, fileData.getOriginalFilename());
+        if (fileFormatService.getIconByFilename(fileData.getOriginalFilename()) == null)
+            return UploadStatusesWrapper.getStatus(
+                    UploadStatuses.WRONG_FORMAT, fileData.getOriginalFilename());
         return someSave(fileDescription, fileData);
     }
 
@@ -56,11 +62,10 @@ public class AttachmentServiceImpl implements AttachmentService {
             Attach uploadAttachment = getAttach(fileDescription, fileData);
             attachDAO.saveAttach(uploadAttachment);
             attachDAO.addAttachGroups(uploadAttachment, groupDAO.selectGroupsByUserId(uploadAttachment.getOwner().getId()));
-
-            return env.getProperty("success") + "'" + uploadAttachment.getFileName() + "' upload done";
+            return UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, uploadAttachment.getFileName());
         } catch (Exception e) {
             log.error(e);
-           return e.getLocalizedMessage();
+            return UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW, e.getLocalizedMessage());
         }
     }
 

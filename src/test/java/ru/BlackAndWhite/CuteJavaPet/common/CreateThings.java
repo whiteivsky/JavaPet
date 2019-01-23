@@ -22,13 +22,11 @@ public class CreateThings {
         for (int i = 0; i < name.length; i++) {
             mpArray[i] = newMultipartFile(generateFile(name[i], ext[i], empty[i]));
         }
-//        // first - isNormal,
-//
-//
-//        mpArray[1] = newMultipartFile(generateFile("empty", "doc", true));
-//        // third - isWrongExt
-//        mpArray[2] = newMultipartFile(generateFile("wrong ext", "wrg", false));
         return mpArray;
+    }
+
+    public static MultipartFile newMultipartFile(String name, String ext, boolean empty) throws IOException {
+        return newMultipartFile(generateFile(name, ext, empty));
     }
 
     private static MultipartFile newMultipartFile(File newFile) {
@@ -76,6 +74,9 @@ public class CreateThings {
         };
     }
 
+    public static List<User> newUserList(int count) {
+        return IntStream.range(0, count).mapToObj(CreateThings::newUser).collect(Collectors.toList());
+    }
 
     public static User newUser(Integer id) {
         User newUser = newUser();
@@ -141,6 +142,14 @@ public class CreateThings {
 
         //newAttach.setFileFormat(fileFormatDAO.getIconByFilename("newAttach.txt"));
         return newAttach;
+    }
+
+    public static FileFormat[] newFileFormatArray(MultipartFile[] fileDatas) throws Exception {
+        FileFormat[] newResult = new FileFormat[fileDatas.length];
+        for (int i = 0; i < fileDatas.length; i++) {
+            newResult[i] = newFileFormat(fileDatas[i]);
+        }
+        return newResult;
     }
 
     public static FileFormat newFileFormat(MultipartFile fileData) throws Exception {
