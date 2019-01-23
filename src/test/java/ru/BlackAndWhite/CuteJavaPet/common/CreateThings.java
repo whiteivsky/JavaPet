@@ -74,8 +74,8 @@ public class CreateThings {
         };
     }
 
-    public static List<User> newUserList(int count) {
-        return IntStream.range(0, count).mapToObj(CreateThings::newUser).collect(Collectors.toList());
+    public static List<User> newUserList(int listSize) {
+        return IntStream.range(0, listSize).mapToObj(CreateThings::newUser).collect(Collectors.toList());
     }
 
     public static User newUser(Integer id) {
@@ -105,9 +105,8 @@ public class CreateThings {
     }
 
     public static List<Group> newGroupList(int listSize) {
-        List<Group> groups = IntStream.range(0, listSize)
+        return IntStream.range(0, listSize)
                 .mapToObj(i -> CreateThings.newGroup()).collect(Collectors.toList());
-        return groups;
     }
 
     public static Attach newAttach(Integer id) {

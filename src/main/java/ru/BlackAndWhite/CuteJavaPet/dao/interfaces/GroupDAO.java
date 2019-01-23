@@ -18,9 +18,9 @@ public interface GroupDAO {
 
     List<Group> selectAllGroups();
 
-    void delUserGroup(User user, Group group);
+    void delUserFromGroup(User user, Group group);
 
-    void addUserGroup(User user, Group group);
+    void addUserToGroup(User user, Group group);
 
     List<User> selectUsersByGroupId(Integer id);
 

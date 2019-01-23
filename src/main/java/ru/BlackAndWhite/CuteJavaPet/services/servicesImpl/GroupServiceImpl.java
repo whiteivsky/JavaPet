@@ -65,24 +65,24 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void delUserFromGroup(User user, Group group) {
-        groupDAO.delUserGroup(user, group);
+        groupDAO.delUserFromGroup(user, group);
     }
 
     @Override
     public void addUserToGroup(User user, Group group) {
-        groupDAO.addUserGroup(user, group);
+        groupDAO.addUserToGroup(user, group);
     }
 
 
     public void addUserToGroups(User user, List<Group> groupList) {
         for (Group curGroup : groupList) {
-            groupDAO.addUserGroup(user, curGroup);
+            groupDAO.addUserToGroup(user, curGroup);
         }
     }
 
     public void delUserFromGroups(User user, List<Group> groupList) {
         for (Group curGroup : groupList) {
-            groupDAO.delUserGroup(user, curGroup);
+            groupDAO.delUserFromGroup(user, curGroup);
         }
     }
 

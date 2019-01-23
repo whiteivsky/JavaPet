@@ -3,7 +3,6 @@ package ru.BlackAndWhite.CuteJavaPet.serviceIntegrationTests;
 
 import lombok.extern.log4j.Log4j;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,8 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.common.CreateThings;
@@ -29,18 +26,17 @@ import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.FileFormatServiceImpl;
 import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @Log4j
-@PropertySource(value = {"classpath:/uploadStatuses.properties"})
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ServiceTestConfig.class})
 public class AttachmentIntegrationTest {
@@ -53,8 +49,7 @@ public class AttachmentIntegrationTest {
     UserService userService;
     @Mock
     FileFormatServiceImpl fileFormatService;
-    @Resource
-    Environment env;
+
     @Autowired
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
@@ -95,10 +90,10 @@ public class AttachmentIntegrationTest {
         try {
             String[] originalResults = setUpSaveAttachmentsTest(files);
             List<String> results = attachmentService.saveAttachments("allFiles", files);
-            Assert.assertEquals("result count", files.length, results.size());
-            Assert.assertArrayEquals(results.toArray(), originalResults);
+            assertEquals("result count", files.length, results.size());
+            assertArrayEquals(results.toArray(), originalResults);
         } catch (Exception e) {
-            Assert.fail("Error in upload attach" + e.getLocalizedMessage());
+            fail("Error in upload attach" + e.getLocalizedMessage());
         }
     }
 
@@ -110,9 +105,9 @@ public class AttachmentIntegrationTest {
 
         List<String> results = attachmentService.saveAttachments("", CreateThings.newMultipartFileArray(
                 new String[]{"normal"}, new String[]{"txt"}, new boolean[]{false}));
-        Assert.assertNotNull(results);
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW,
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW,
                 new Exception().getLocalizedMessage()),
                 results.get(0));
     }
@@ -120,16 +115,16 @@ public class AttachmentIntegrationTest {
     @Test
     public void saveAttachmetsNullFilesTest() {
         try {
-            Assert.assertNotNull(attachmentService.saveAttachments("testDescr", null));
+            assertNotNull(attachmentService.saveAttachments("testDescr", null));
         } catch (NullPointerException e) {
-            Assert.assertEquals(e.getClass().getName(), NullPointerException.class.getName());
+            assertEquals(e.getClass().getName(), NullPointerException.class.getName());
         }
     }
 
     @Test
     public void selectAttachmentByIDTest() throws Exception {
-        when(attachDAO.selectAttachByID(1)).thenReturn(CreateThings.newAttach(1));
-        Assert.assertEquals(CreateThings.newAttach(1), attachmentService.selectAttachmentByID(1));
+        when(attachDAO.selectAttachByID(anyInt())).thenReturn(CreateThings.newAttach(1));
+        assertEquals(CreateThings.newAttach(1), attachmentService.selectAttachmentByID(1));
     }
 
     @Test
@@ -137,9 +132,9 @@ public class AttachmentIntegrationTest {
         User user = CreateThings.newUser();
         List<Attach> attachList = setUpSelectAttachmentsbyUserTest(user);
         List<Attach> attachListTest = attachmentService.selectAttachmentsbyUser(user);
-        Assert.assertNotNull(attachListTest);
-        Assert.assertEquals(3, attachListTest.size());
-        Assert.assertEquals(attachList, attachListTest);
+        assertNotNull(attachListTest);
+        assertEquals(3, attachListTest.size());
+        assertEquals(attachList, attachListTest);
     }
 
     @NotNull

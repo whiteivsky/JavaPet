@@ -57,12 +57,12 @@ public class GroupDAOImpl implements GroupDAO {
         return groups;
     }
 
-    public void delUserGroup(User user, Group group) {
+    public void delUserFromGroup(User user, Group group) {
         sqlSession.getMapper(GroupMapper.class).delUserGroup(user.getId(), group.getId());
         sqlSession.commit();
     }
 
-    public void addUserGroup(User user, Group group) {
+    public void addUserToGroup(User user, Group group) {
         sqlSession.getMapper(GroupMapper.class).addUserGroup(user.getId(), group.getId());
         sqlSession.commit();
     }
