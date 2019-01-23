@@ -16,15 +16,11 @@ import java.util.stream.Stream;
 @Service
 @Log4j
 public class GroupServiceImpl implements GroupService {
-    final private GroupDAO groupDAO;
-
     @Autowired
     UserDAO userDAO;
 
     @Autowired
-    public GroupServiceImpl(GroupDAO groupDAO) {
-        this.groupDAO = groupDAO;
-    }
+    GroupDAO groupDAO;
 
 
     @Override

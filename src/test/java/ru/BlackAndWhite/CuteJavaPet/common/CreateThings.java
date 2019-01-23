@@ -74,6 +74,9 @@ public class CreateThings {
         };
     }
 
+    public static List<User> newUserList(int count) {
+        return IntStream.range(0, count).mapToObj(CreateThings::newUser).collect(Collectors.toList());
+    }
 
     public static User newUser(Integer id) {
         User newUser = newUser();
