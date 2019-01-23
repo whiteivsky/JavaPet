@@ -32,7 +32,7 @@ public class UploadController {
     @GetMapping(path = "upload")
     public Model uploadOneFileHandler(Model model) {
 
-        List<FileFormat> fileFormats = fileFormatService.selectIcons();
+        List<FileFormat> fileFormats = fileFormatService.getAllIcons();
 
         model.addAttribute("formats", fileFormats.stream().map(x -> "." + x.getName())
                 .collect(Collectors.joining(",")));
@@ -43,7 +43,7 @@ public class UploadController {
     public Model handleFileUpload(@RequestParam("filedescription") String filedescription,
                                   @RequestParam("fileData") MultipartFile[] files,
                                   Model curModel) {
-        List<FileFormat> fileFormats = fileFormatService.selectIcons();
+        List<FileFormat> fileFormats = fileFormatService.getAllIcons();
 
         curModel.addAttribute("formats", fileFormats.stream().map(x -> "." + x.getName())
                 .collect(Collectors.joining(",")));

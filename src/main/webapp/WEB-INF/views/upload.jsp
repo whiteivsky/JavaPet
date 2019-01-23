@@ -6,7 +6,7 @@
   Time: 12:38
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 
 <%@ include file="header.jsp" %>
@@ -21,7 +21,8 @@
                 <tr>
                     <td>
                         <label class="btn btn-block btn-primary">
-                            Browse&hellip; <input type="file" accept="${formats}" multiple name="fileData" id="uploadFormControlFile1"
+                            Browse&hellip; <input type="file" accept="${formats}" multiple name="fileData"
+                                                  id="uploadFormControlFile1"
                                                   style="display: none;">
                         </label>
                         <script>
@@ -47,16 +48,22 @@
         </div>
 
         <div class="panel-body">
-
-            <input type="submit" class="btn btn-default" value="Upload"> Press here to upload <span class="badge"
-                                                                                                    id="badge1"></span>
-            files!
+            <input type="submit" class="btn btn-default"
+                   value="Upload"> Press here to upload <span class="badge" id="badge1"></span>files!
         </div>
+
         <div class="panel-footer">
             <c:forEach var="uploadStatuses" items="${uploadStatuses}">
                 <!-- Тут нужно вставить обработчик статусов для парсинга дизайна-->
-                <div class="alert alert-warning">
-                        ${uploadStatuses} </div>
+                <c:if test="${uploadStatuses.substring(0,7)=='success'}">
+                    <div class="alert alert-success">${uploadStatuses.substring(7)}</div>
+                </c:if>
+                <c:if test="${uploadStatuses.substring(0,13)=='warning_empty'}">
+                    <div class="alert alert-warning">${uploadStatuses.substring(13)}</div>
+                </c:if>
+                <c:if test="${uploadStatuses.substring(0,20)=='warning_wrong_format'}">
+                    <div class="alert alert-danger">${uploadStatuses.substring(20)}</div>
+                </c:if>
             </c:forEach>
         </div>
     </div>

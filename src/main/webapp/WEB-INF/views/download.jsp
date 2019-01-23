@@ -13,15 +13,21 @@
 
 <%@ include file="header.jsp" %>
 <title>Download page</title>
-
+<legend>Download files</legend>
 <div class="panel panel-default">
     <!-- Default panel contents -->
     <div class="panel-heading">Download list</div>
-
+    <div class="tooltip tooltip-top" role="tooltip">
+        <div class="tooltip-arrow"></div>
+        <div class="tooltip-inner">
+            Some tooltip text!
+        </div>
+    </div>
     <c:choose>
         <c:when test="${attaches.size() == 0}">
             <div class="panel-body">
-                <p>Download list is empty, <a href="/upload">upload</a> some files or <a href="/groups">add group</a></p>
+                <p>Download list is empty, <a href="/upload">upload</a> some files or <a href="/groups">add group</a>
+                </p>
             </div>
         </c:when>
         <c:otherwise>
@@ -30,23 +36,24 @@
                     <c:if test="${pageContext.request.userPrincipal.name != null}">
                         <table class="table">
                             <tr>
+                                <th></th>
                                 <th>File name</th>
-                                <th>size</th>
                                 <th>upload date</th>
-                                <th>owner login</th>
-                                <th>description</th>
-                                <th>icon</th>
+                                <th>owner</th>
+                                <th>size</th>
                             </tr>
                             <c:forEach var="attaches" items="${attaches}">
                                 <tr>
-                                    <td><a href="<c:url value='/download/${attaches.id}' />">${attaches.fileName}</a>
-                                    </td>
-                                    <td>${attaches.formatSize}</td>
-                                    <td>${attaches.uploadDate.toLocaleString()}</td>
-                                    <td>${attaches.owner.userName}</td>
-                                    <td>${attaches.description}</td>
                                     <td><img src="data:image/png;base64,${attaches.fileFormat.icon}" width="19"
                                              height="19" alt="img"/></td>
+                                    <td><a href="<c:url value='/download/${attaches.id}' />"
+                                           data-toggle="tooltip" title="${attaches.description}" data-placement="right"
+                                           style="white-space: nowrap;">
+                                            ${attaches.fileName}</a>
+                                    </td>
+                                    <td>${attaches.uploadDate.toLocaleString()}</td>
+                                    <td><span class="label label-info">${attaches.owner.userName}</span></td>
+                                    <td>${attaches.formatSize}</td>
                                 </tr>
                             </c:forEach>
                         </table>
@@ -56,6 +63,5 @@
         </c:otherwise>
     </c:choose>
 </div>
-
-
+<script src="https://github.com/HubSpot/tether/blob/master/dist/js/tether.min.js"></script>
 <%@ include file="footer.jsp" %>
