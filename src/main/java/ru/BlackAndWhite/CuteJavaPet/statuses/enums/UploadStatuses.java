@@ -4,7 +4,8 @@ public enum UploadStatuses {
     EMPTY,
     WRONG_FORMAT,
     SUCCESS,
-    BAD_ENCODE;
+    BAD_ENCODE,
+    UNKNOW;
 
     UploadStatuses() {
     }

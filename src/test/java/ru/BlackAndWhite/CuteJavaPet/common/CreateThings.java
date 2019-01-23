@@ -25,6 +25,10 @@ public class CreateThings {
         return mpArray;
     }
 
+    public static MultipartFile newMultipartFile(String name, String ext, boolean empty) throws IOException {
+        return newMultipartFile(generateFile(name, ext, empty));
+    }
+
     private static MultipartFile newMultipartFile(File newFile) {
         return new MultipartFile() {
             @Override

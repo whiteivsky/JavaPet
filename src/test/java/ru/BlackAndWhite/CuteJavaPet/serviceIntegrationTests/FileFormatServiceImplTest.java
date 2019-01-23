@@ -24,11 +24,11 @@ import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Log4j
 @PropertySource(value = {"classpath:/uploadStatuses.properties"})
@@ -85,21 +85,46 @@ public class FileFormatServiceImplTest {
         }
     }
 
+    @Test
+    public void saveWithErrors() throws Exception {
+
+        MultipartFile[] multipartFiles = new MultipartFile[1];
+        multipartFiles[0] = CreateThings.newMultipartFile("doc", "png", false);
+        doThrow(UnsupportedEncodingException.class)
+                .when(fileFormatDAO).save(any());
+
+        List<String> results = fileFormatService.upload(multipartFiles);
+        Assert.assertNotNull(results);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.BAD_ENCODE,
+                multipartFiles[0].getOriginalFilename()),
+                results.get(0));
+
+        doThrow(Exception.class).when(fileFormatDAO).save(any());
+        results = fileFormatService.upload(multipartFiles);
+        Assert.assertNotNull(results);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW,
+                new Exception().getLocalizedMessage()),
+                results.get(0));
+
+    }
+
 
     @Test
     public void getIconByFilename() throws Exception {
         FileFormat fileFormat = CreateThings.newFileFormat("doc", "png", false);
         when(fileFormatDAO.getIconByFilename("doc")).thenReturn(fileFormat);
-        Assert.assertEquals(fileFormatDAO.getIconByFilename("doc"), fileFormat);
-        Assert.assertNotNull(fileFormatDAO.getIconByFilename("doc"));
+        Assert.assertEquals(fileFormatService.getIconByFilename("doc"), fileFormat);
+        Assert.assertNotNull(fileFormatService.getIconByFilename("doc"));
     }
 
     @Test
     public void getAllIcons() throws Exception {
         FileFormat[] fileFormats = CreateThings.newFileFormatArray(getMultipartFiles());
         when(fileFormatDAO.getAllIcons()).thenReturn(Arrays.asList(fileFormats));
-        Assert.assertArrayEquals(fileFormatDAO.getAllIcons().toArray(), fileFormats);
-        Assert.assertNotNull(fileFormatDAO.getAllIcons());
+        Assert.assertArrayEquals(fileFormatService.getAllIcons().toArray(), fileFormats);
+        Assert.assertNotNull(fileFormatService.getAllIcons());
     }
 
     @Test

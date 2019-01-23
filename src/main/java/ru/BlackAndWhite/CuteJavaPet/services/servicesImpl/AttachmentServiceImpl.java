@@ -65,7 +65,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             return UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, uploadAttachment.getFileName());
         } catch (Exception e) {
             log.error(e);
-            return e.getLocalizedMessage();
+            return UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW, e.getLocalizedMessage());
         }
     }
 

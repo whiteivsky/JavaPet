@@ -21,6 +21,7 @@ import ru.BlackAndWhite.CuteJavaPet.common.ServiceTestConfig;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.AttachDAO;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.GroupDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.Attach;
+import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.AttachmentServiceImpl;
@@ -33,6 +34,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @Log4j
@@ -78,6 +82,7 @@ public class AttachmentIntegrationTest {
         return originalResults;
 
     }
+
     @Test
     public void saveAttachmentsTest() throws IOException {
         MultipartFile[] files = CreateThings.newMultipartFileArray(
@@ -95,6 +100,21 @@ public class AttachmentIntegrationTest {
         } catch (Exception e) {
             Assert.fail("Error in upload attach" + e.getLocalizedMessage());
         }
+    }
+
+    @Test
+    public void saveAttachmentsWithError() throws Exception {
+        doThrow(Exception.class).when(attachDAO).saveAttach(any());
+        doThrow(Exception.class).when(attachDAO).addAttachGroups(any(), any());
+        when(fileFormatService.getIconByFilename(anyString())).thenReturn(new FileFormat());
+
+        List<String> results = attachmentService.saveAttachments("", CreateThings.newMultipartFileArray(
+                new String[]{"normal"}, new String[]{"txt"}, new boolean[]{false}));
+        Assert.assertNotNull(results);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW,
+                new Exception().getLocalizedMessage()),
+                results.get(0));
     }
 
     @Test

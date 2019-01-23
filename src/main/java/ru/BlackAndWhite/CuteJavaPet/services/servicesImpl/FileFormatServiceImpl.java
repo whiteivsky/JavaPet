@@ -44,8 +44,8 @@ public class FileFormatServiceImpl implements FileFormatService {
         } catch (UnsupportedEncodingException e) {
             return UploadStatusesWrapper.getStatus(UploadStatuses.BAD_ENCODE, fileData.getOriginalFilename());
         } catch (Exception e) {
-            return e.getLocalizedMessage();
-            //todo Вставить обработчик неожиданных ошибок
+            return UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW, e.getLocalizedMessage());
+
         }
     }
 
