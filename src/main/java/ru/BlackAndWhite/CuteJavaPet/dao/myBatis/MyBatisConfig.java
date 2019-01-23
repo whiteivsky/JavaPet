@@ -23,8 +23,8 @@ public class MyBatisConfig {
     @Bean
     public DataSource dataSource() {
         DataSource dataSource = new DataSource();
-        //todo перенести обратно в настройки...
 
+        //todo перенести обратно в настройки...
         dataSource.setUrl("jdbc:h2:" + System.getProperty("user.dir") +
                 "/H2DB/db;INIT=RUNSCRIPT FROM 'classpath:sqlScripts/createTables.sql'\\;" +
                 "RUNSCRIPT FROM 'classpath:sqlScripts/insertData.sql'");
