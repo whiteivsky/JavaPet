@@ -25,8 +25,11 @@ import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.AttachmentServiceImpl;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.FileFormatServiceImpl;
+import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
+import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,14 +61,7 @@ public class AttachmentIntegrationTest {
     }
 
     @NotNull
-    public MultipartFile[] setUpSaveAttachmentsTest() throws Exception {
-        MultipartFile[] files = CreateThings.newMultipartFileArray(
-                new String[]{"normal", "empty", "wrong"},
-                new String[]{"doc", "docx", "wrg"},
-                new boolean[]{false, true, false});
-        // first - isNormal,
-        // second - isEmpty,
-        // third - isWrongExt
+    public String[] setUpSaveAttachmentsTest(MultipartFile[] files) throws Exception {
         when(fileFormatService.getIconByFilename(files[0].getOriginalFilename()))
                 .thenReturn(CreateThings.newFileFormat(files[0]));
         when(fileFormatService.getIconByFilename(files[1].getOriginalFilename()))
@@ -74,18 +70,28 @@ public class AttachmentIntegrationTest {
                 .thenReturn(null);
         when(groupDAO.selectGroupsByUserId(1)).thenReturn(CreateThings.newGroupList(1));
         when(userService.getCurrentLoggedUser()).thenReturn(CreateThings.newUser(1));
-        return files;
+
+        String[] originalResults = new String[3];
+        originalResults[0] = UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, files[0].getOriginalFilename());
+        originalResults[1] = UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, files[1].getOriginalFilename());
+        originalResults[2] = UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, files[2].getOriginalFilename());
+        return originalResults;
+
     }
     @Test
-    public void saveAttachmentsTest() {
+    public void saveAttachmentsTest() throws IOException {
+        MultipartFile[] files = CreateThings.newMultipartFileArray(
+                new String[]{"normal", "empty", "wrong"},
+                new String[]{"doc", "docx", "wrg"},
+                new boolean[]{false, true, false});
+        // first - isNormal,
+        // second - isEmpty,
+        // third - isWrongExt
         try {
-            List<String> statuses = attachmentService.saveAttachments("allFiles", setUpSaveAttachmentsTest());
-            Assert.assertTrue("error" + env.getProperty("success"),
-                    statuses.get(0).startsWith(env.getProperty("success")));
-            Assert.assertTrue("error" + env.getProperty("empty"),
-                    statuses.get(1).startsWith(env.getProperty("empty")));
-            Assert.assertTrue("error" + env.getProperty("wrongFormat"),
-                    statuses.get(2).startsWith(env.getProperty("wrongFormat")));
+            String[] originalResults = setUpSaveAttachmentsTest(files);
+            List<String> results = attachmentService.saveAttachments("allFiles", files);
+            Assert.assertEquals("result count", files.length, results.size());
+            Assert.assertArrayEquals(results.toArray(), originalResults);
         } catch (Exception e) {
             Assert.fail("Error in upload attach" + e.getLocalizedMessage());
         }
