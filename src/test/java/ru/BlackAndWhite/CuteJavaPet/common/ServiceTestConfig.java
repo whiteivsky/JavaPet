@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Log4j
 @Configuration
 @ComponentScan(value = {"ru.BlackAndWhite.CuteJavaPet.*"})
+
 public class ServiceTestConfig {
 
     @Bean

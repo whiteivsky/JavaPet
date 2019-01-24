@@ -114,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Object setNewGroupListToUser(String[] applyGroupList, String newGroupName, User currentLoggedUser) {
         ArrayList<String> status = new ArrayList<>();
-
+        if (currentLoggedUser == null) return null;
         if (applyGroupList == null) {
             // The array is empty, remove user groups
             replaceGroupsOfUser(currentLoggedUser, null);
@@ -130,16 +130,16 @@ public class GroupServiceImpl implements GroupService {
         }
 
         // working with new group
-        addNewGroupToUser(newGroupName, currentLoggedUser, (ArrayList) status);
-        return status;
+        return addNewGroupToUser(newGroupName, currentLoggedUser, status);
     }
 
-    private void addNewGroupToUser(String newGroupName, User currentLoggedUser, ArrayList status) {
+    private ArrayList addNewGroupToUser(String newGroupName, User currentLoggedUser, ArrayList<String> status) {
         if (newGroupName != null && !newGroupName.equals("")) {
             createGroup(newGroupName);
             addUserToGroup(currentLoggedUser,
                     groupDAO.selectGroupByName(newGroupName));
             status.add("add new group '" + newGroupName + "'");
         }
+        return status;
     }
 }

@@ -21,8 +21,7 @@ import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.GroupServiceImpl;
 
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static ru.BlackAndWhite.CuteJavaPet.common.CreateThings.*;
 
@@ -36,6 +35,7 @@ public class GroupServiceImplTest {
     @InjectMocks
     private GroupServiceImpl groupService;
 
+    //default variable
     private List<User> originalUserList = newUserList(3);
     private List<Group> default3Groups = newGroupList(3);
     private Group originalGroup = newGroup(1);
@@ -142,7 +142,7 @@ public class GroupServiceImplTest {
 
     @Test
     //User=null
-    public void replaceGroupsOfNullUser() {
+    public void replaceGroupsOfUser_AsNull() {
         groupService.replaceGroupsOfUser(null, default3Groups);
         verifyZeroInteractions(groupDAO);
     }
@@ -158,7 +158,7 @@ public class GroupServiceImplTest {
 
     @Test
     //No one group has been selected - delete all
-    public void replaceGroupsOfUserWithoutGroups() {
+    public void replaceGroupsOfUser_WithoutGroups() {
         GroupService newGS = setUpMocksDAO(default3Groups);
         newGS.replaceGroupsOfUser(originalUser, null);
         verify(newGS, times(1)).delUserFromGroups(any(User.class), anyListOf(Group.class));
@@ -167,7 +167,7 @@ public class GroupServiceImplTest {
 
     @Test
     //No one group has been selected - delete all
-    public void replaceGroupsOfUserWithSameGroups() {
+    public void replaceGroupsOfUser_WithSameGroups() {
         GroupService newGS = setUpMocksDAO(default3Groups);
         newGS.replaceGroupsOfUser(originalUser, default3Groups);
         verify(newGS, never()).delUserFromGroups(any(User.class), anyListOf(Group.class));
@@ -176,7 +176,7 @@ public class GroupServiceImplTest {
 
     @Test
     //No one group has been selected - delete all
-    public void replaceGroupsOfUserWithDifferentGroups() {
+    public void replaceGroupsOfUser_WithDifferentGroups() {
         GroupService newGS = setUpMocksDAO(default3Groups);
         newGS.replaceGroupsOfUser(originalUser, newGroupList(2));
         verify(newGS, times(1)).delUserFromGroups(originalUser, default3Groups);
@@ -187,14 +187,65 @@ public class GroupServiceImplTest {
     public GroupService setUpMocksDAO(List<Group> o) {
         GroupService newGS = Mockito.spy(groupService);
         when(groupDAO.selectGroupsByUserId(anyInt())).thenReturn(o);
+        if (o != null)
+            o.forEach(x -> when(groupDAO.selectGroupByName(x.getGroupName())).thenReturn(x));
+
         return newGS;
     }
 
     @Test
-    public void setNewGroupListToUser() {
-//        GroupService newGS = setUpMocksDAO(default3Groups);
-//        newGS.replaceGroupsOfUser(originalUser, newGroupList(2));
-//        verify(newGS, never()).delUserFromGroups(originalUser, default3Groups);
-//        verify(newGS, times(1)).addUserToGroups(originalUser, newGroupList(2));
+    public void setNewGroupListToUser_NullNewGroupList_NullNewGroup() {
+        GroupService newGS = setUpMocksDAO(default3Groups);
+
+        assertNotNull(newGS.setNewGroupListToUser(null, null, originalUser));
+
+        verify(newGS, times(1)).replaceGroupsOfUser(originalUser, null);
+        verify(newGS, never()).createGroup(any());
+        verify(groupDAO, never()).selectGroupByName(anyString());
+        verify(newGS, never()).addUserToGroup(any(User.class), any(Group.class));
+    }
+
+    @Test
+    public void setNewGroupListToUser_EmptyUser() {
+        GroupService newGS = setUpMocksDAO(default3Groups);
+
+        assertNull(newGS.setNewGroupListToUser(new String[]{"first", "second"}, null, null));
+        verify(newGS, never()).replaceGroupsOfUser(originalUser, null);
+        verify(groupDAO, never()).selectGroupByName(anyString());
+        verify(newGS, never()).createGroup(any());
+        verify(newGS, never()).addUserToGroup(any(User.class), any(Group.class));
+    }
+
+    @Test
+    public void setNewGroupListToUser_EmptyNewGroup() {
+        GroupService newGS = setUpMocksDAO(default3Groups);
+
+        newGS.setNewGroupListToUser(null, "", originalUser);
+        verify(newGS, times(1)).replaceGroupsOfUser(originalUser, null);
+        verify(groupDAO, never()).selectGroupByName(anyString());
+        verify(newGS, never()).createGroup(any());
+        verify(newGS, never()).addUserToGroup(any(User.class), any(Group.class));
+    }
+
+    @Test
+    public void setNewGroupListToUser_2Groups() {
+        GroupService newGS = setUpMocksDAO(default3Groups);
+
+        newGS.setNewGroupListToUser(new String[]{"first", "second"}, null, originalUser);
+        verify(newGS, times(1)).replaceGroupsOfUser(any(User.class), anyListOf(Group
+                .class));
+        verify(newGS, never()).createGroup(any());
+        verify(newGS, never()).addUserToGroup(any(User.class), any(Group.class));
+    }
+
+    @Test
+    public void setNewGroupListToUser_NewGroup() {
+        GroupService newGS = setUpMocksDAO(default3Groups);
+
+        newGS.setNewGroupListToUser(null, "newGroupName", originalUser);
+        verify(newGS, times(1)).replaceGroupsOfUser(originalUser, null);
+        verify(groupDAO, times(1)).selectGroupByName(anyString());
+        verify(newGS, times(1)).createGroup(any());
+        verify(newGS, times(1)).addUserToGroup(any(User.class), any(Group.class));
     }
 }
