@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.FileFormatDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.services.FileFormatService;
-import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.IOException;
@@ -35,16 +34,16 @@ public class FileFormatServiceImpl implements FileFormatService {
 
     public String fileParametersCheckAndSave(MultipartFile fileData) {
         if (fileData.isEmpty())
-            return UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, fileData.getOriginalFilename());
+            return UploadStatuses.EMPTY.getStatus(fileData.getOriginalFilename());
         if (!fileData.getOriginalFilename().endsWith(".png"))
-            return UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, fileData.getOriginalFilename());
+            return UploadStatuses.WRONG_FORMAT.getStatus(fileData.getOriginalFilename());
         try {
             fileFormatDAO.save(getFileFormat(fileData));
-            return UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, fileData.getOriginalFilename());
+            return UploadStatuses.SUCCESS.getStatus(fileData.getOriginalFilename());
         } catch (UnsupportedEncodingException e) {
-            return UploadStatusesWrapper.getStatus(UploadStatuses.BAD_ENCODE, fileData.getOriginalFilename());
+            return UploadStatuses.BAD_ENCODE.getStatus(fileData.getOriginalFilename());
         } catch (Exception e) {
-            return UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW, e.getLocalizedMessage());
+            return UploadStatuses.UNKNOW.getStatus(e.getLocalizedMessage());
 
         }
     }

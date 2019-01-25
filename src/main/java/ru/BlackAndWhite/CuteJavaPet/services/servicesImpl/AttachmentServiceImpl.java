@@ -11,7 +11,6 @@ import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.AttachmentService;
 import ru.BlackAndWhite.CuteJavaPet.services.GroupService;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
-import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.IOException;
@@ -40,9 +39,9 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private String saveAttach(String fileDescription, MultipartFile fileData) {
         if (fileData.isEmpty())
-            return UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, fileData.getOriginalFilename());
+            return UploadStatuses.EMPTY.getStatus(fileData.getOriginalFilename());
         if (fileFormatService.getIconByFilename(fileData.getOriginalFilename()) == null)
-            return UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, fileData.getOriginalFilename());
+            return UploadStatuses.WRONG_FORMAT.getStatus(fileData.getOriginalFilename());
 
         return someSave(fileDescription, fileData);
     }
@@ -52,10 +51,10 @@ public class AttachmentServiceImpl implements AttachmentService {
             Attach uploadAttachment = getAttach(fileDescription, fileData);
             attachDAO.saveAttach(uploadAttachment);
             attachDAO.addAttachGroups(uploadAttachment, groupService.selectGroupsByUserId(uploadAttachment.getOwner().getId()));
-            return UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, uploadAttachment.getFileName());
+            return UploadStatuses.SUCCESS.getStatus(uploadAttachment.getFileName());
         } catch (Exception e) {
             log.error(e);
-            return UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW, e.getLocalizedMessage());
+            return UploadStatuses.UNKNOW.getStatus(e.getLocalizedMessage());
         }
     }
 

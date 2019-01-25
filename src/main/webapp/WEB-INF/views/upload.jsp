@@ -56,13 +56,13 @@
             <c:forEach var="uploadStatuses" items="${uploadStatuses}">
                 <!-- Тут нужно вставить обработчик статусов для парсинга дизайна-->
                 <c:if test="${uploadStatuses.substring(0,7)=='success'}">
-                    <div class="alert alert-success">${uploadStatuses.substring(7)}</div>
+                    <div class="alert alert-success">${uploadStatuses.substring(7)} uploaded</div>
                 </c:if>
                 <c:if test="${uploadStatuses.substring(0,13)=='warning_empty'}">
-                    <div class="alert alert-warning">${uploadStatuses.substring(13)}</div>
+                    <div class="alert alert-warning">${uploadStatuses.substring(13)} is empty file</div>
                 </c:if>
-                <c:if test="${uploadStatuses.substring(0,20)=='warning_wrong_format'}">
-                    <div class="alert alert-danger">${uploadStatuses.substring(20)}</div>
+                <c:if test="${uploadStatuses.substring(0,13)=='warning_wrong'}">
+                    <div class="alert alert-danger">${uploadStatuses.substring(20)} has wrong format</div>
                 </c:if>
             </c:forEach>
         </div>

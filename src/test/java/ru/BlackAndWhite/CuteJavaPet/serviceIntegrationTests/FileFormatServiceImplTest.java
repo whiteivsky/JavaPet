@@ -18,7 +18,6 @@ import ru.BlackAndWhite.CuteJavaPet.common.ServiceTestConfig;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.FileFormatDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.FileFormatServiceImpl;
-import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.IOException;
@@ -68,9 +67,9 @@ public class FileFormatServiceImplTest {
         doNothing().when(fileFormatDAO).save(any(FileFormat.class));
 
         String[] originalResults = new String[3];
-        originalResults[0] = UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, files[0].getOriginalFilename());
-        originalResults[1] = UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, files[1].getOriginalFilename());
-        originalResults[2] = UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, files[2].getOriginalFilename());
+        originalResults[0] = UploadStatuses.SUCCESS.getStatus(files[0].getOriginalFilename());
+        originalResults[1] = UploadStatuses.EMPTY.getStatus(files[1].getOriginalFilename());
+        originalResults[2] = UploadStatuses.WRONG_FORMAT.getStatus(files[2].getOriginalFilename());
         return originalResults;
     }
 
@@ -94,16 +93,14 @@ public class FileFormatServiceImplTest {
         List<String> results = fileFormatService.upload(multipartFiles);
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.BAD_ENCODE,
-                multipartFiles[0].getOriginalFilename()),
+        assertEquals(UploadStatuses.BAD_ENCODE.getStatus(multipartFiles[0].getOriginalFilename()),
                 results.get(0));
 
         doThrow(Exception.class).when(fileFormatDAO).save(any());
         results = fileFormatService.upload(multipartFiles);
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW,
-                new Exception().getLocalizedMessage()),
+        assertEquals(UploadStatuses.UNKNOW.getStatus(new Exception().getLocalizedMessage()),
                 results.get(0));
 
     }
