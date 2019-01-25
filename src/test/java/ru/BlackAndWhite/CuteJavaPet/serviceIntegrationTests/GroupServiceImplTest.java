@@ -232,8 +232,7 @@ public class GroupServiceImplTest {
         GroupService newGS = setUpMocksDAO(default3Groups);
 
         newGS.setNewGroupListToUser(new String[]{"first", "second"}, null, originalUser);
-        verify(newGS, times(1)).replaceGroupsOfUser(any(User.class), anyListOf(Group
-                .class));
+        verify(newGS, times(1)).replaceGroupsOfUser(any(User.class), anyListOf(Group.class));
         verify(newGS, never()).createGroup(any());
         verify(newGS, never()).addUserToGroup(any(User.class), any(Group.class));
     }
