@@ -1,12 +1,25 @@
 package ru.BlackAndWhite.CuteJavaPet.statuses.enums;
 
+//todo UNKNOW - не хорошо
 public enum UploadStatuses {
-    EMPTY,
-    WRONG_FORMAT,
-    SUCCESS,
-    BAD_ENCODE,
-    UNKNOW;
+    EMPTY("warning_empty"),
+    WRONG_FORMAT("warning_wrong_format"),
+    SUCCESS("success"),
+    BAD_ENCODE("can't encode to Base64"),
+    UNKNOW("unknow");
 
-    UploadStatuses() {
+    private String msg;
+
+    UploadStatuses(String msg) {
+        this.msg = msg;
     }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public String getStatus(String fileName) {
+        return getMsg() + "'" + fileName + "' ";
+    }
+
 }
