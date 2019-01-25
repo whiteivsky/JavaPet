@@ -195,11 +195,11 @@ public class CreateThings {
     public static MultipartFile getFileByStatus(UploadStatuses status) {
         switch (status) {
             case EMPTY:
-                return newMultipartFile("Empty", "empty", true);
+                return newMultipartFile("Empty", "png", true);
             case WRONG_FORMAT:
                 return newMultipartFile("WrongFormat", "wrongFormat", false);
             case SUCCESS:
-                return newMultipartFile("Success", "success", false);
+                return newMultipartFile("Success", "png", false);
             case BAD_ENCODE:
                 break;
             case UNKNOW:

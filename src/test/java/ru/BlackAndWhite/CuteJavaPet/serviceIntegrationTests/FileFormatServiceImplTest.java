@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.common.ServiceTestConfig;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.*;
 import static ru.BlackAndWhite.CuteJavaPet.common.CreateThings.*;
 
 @Log4j
-@PropertySource(value = {"classpath:/uploadStatuses.properties"})
+//@PropertySource(value = {"classpath:/uploadStatuses.properties"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ServiceTestConfig.class})
 public class FileFormatServiceImplTest {
@@ -70,26 +69,26 @@ public class FileFormatServiceImplTest {
 
 
     @Test
-    public void saveNull() {
+    public void upload_Null() {
         assertNull(fileFormatService.upload(null));
     }
 
     @Test
-    public void save_UnsupportedEncodingException() {
+    public void upload_UnsupportedEncodingException() throws Exception {
         MultipartFile[] multipartFiles = getFiles(allTypesFilesMap);
         String[] originalResults = getStatus(allTypesFilesMap);
-        doThrow(UnsupportedEncodingException.class).when(fileFormatDAO).save(any());
+        doThrow(UnsupportedEncodingException.class).when(fileFormatDAO).save(newFileFormat(fileWrongFormat));
 
         List<String> results = fileFormatService.upload(multipartFiles);
 
-        assertArrayEquals(originalResults, results.toArray());
+        assertEquals(originalResults[originalResults.length - 1], results.get(results.size() - 1));
     }
 
     @Test
-    public void save_Exception() {
+    public void upload_Exception() throws Exception {
         MultipartFile[] multipartFiles = getFiles(allTypesFilesMap);
         String[] originalResults = getStatus(allTypesFilesMap);
-        doThrow(Exception.class).when(fileFormatDAO).save(any());
+        doThrow(Exception.class).when(fileFormatDAO).save(newFileFormat(fileSuccess));
 
         List<String> results = fileFormatService.upload(multipartFiles);
 
@@ -100,9 +99,10 @@ public class FileFormatServiceImplTest {
     @Test
     public void getIconByFilename() throws Exception {
         FileFormat fileFormat = newFileFormat("doc", "png", false);
+        when(fileFormatDAO.getIconByFilename(anyString())).thenReturn(fileFormat);
 
-        assertEquals(fileFormatService.getIconByFilename("doc"), fileFormat);
-        assertNotNull(fileFormatService.getIconByFilename("doc"));
+        assertEquals(fileFormat, fileFormatService.getIconByFilename("doc"));
+        verify(fileFormatDAO).getIconByFilename("doc");
     }
 
     @Test
