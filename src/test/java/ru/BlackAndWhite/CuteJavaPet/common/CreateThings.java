@@ -7,11 +7,16 @@ import ru.BlackAndWhite.CuteJavaPet.model.Attach;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.model.Group;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
+import ru.BlackAndWhite.CuteJavaPet.serviceIntegrationTests.AttachmentIntegrationTest;
+import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.mockito.Mockito.when;
 
 @Log4j
 public class CreateThings {
@@ -20,12 +25,12 @@ public class CreateThings {
     public static MultipartFile[] newMultipartFileArray(String[] name, String[] ext, boolean[] empty) throws IOException {
         MultipartFile[] mpArray = new MultipartFile[name.length];
         for (int i = 0; i < name.length; i++) {
-            mpArray[i] = newMultipartFile(generateFile(name[i], ext[i], empty[i]));
+            mpArray[i] = newMultipartFile(name[i], ext[i], empty[i]);
         }
         return mpArray;
     }
 
-    public static MultipartFile newMultipartFile(String name, String ext, boolean empty) throws IOException {
+    public static MultipartFile newMultipartFile(String name, String ext, boolean empty) {
         return newMultipartFile(generateFile(name, ext, empty));
     }
 
@@ -37,10 +42,7 @@ public class CreateThings {
             }
 
             @Override
-            public String getOriginalFilename() {
-
-                return newFile.getName();
-            }
+            public String getOriginalFilename() {return newFile.getName();}
 
             @Override
             public String getContentType() {
@@ -58,14 +60,10 @@ public class CreateThings {
             }
 
             @Override
-            public byte[] getBytes() throws IOException {
-                return new byte[0];
-            }
+            public byte[] getBytes() throws IOException {return new byte[0];}
 
             @Override
-            public InputStream getInputStream() throws IOException {
-                return new FileInputStream(newFile);
-            }
+            public InputStream getInputStream() throws IOException {return new FileInputStream(newFile);}
 
             @Override
             public void transferTo(File file) throws IOException, IllegalStateException {
@@ -118,12 +116,7 @@ public class CreateThings {
 
     public static Attach newAttach() {
         Attach newAttach = new Attach();
-        File tmpfile = null;
-        try {
-            tmpfile = generateFile("newFile", "txt", false);
-        } catch (IOException e) {
-            log.error(e);
-        }
+        File tmpfile = generateFile("newFile", "txt", false);
         InputStream is = null;
         try {
             is = new FileInputStream(tmpfile);
@@ -154,17 +147,17 @@ public class CreateThings {
 
     public static FileFormat newFileFormat(MultipartFile fileData) throws Exception {
         FileFormat format = new FileFormat();
-        byte[] encodeBase64 = Base64.encodeBase64(fileData.getBytes());
-        String base64Encoded = null;
-        try {
-            base64Encoded = new String(encodeBase64, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        format.setIcon(base64Encoded);
-        format.setMediaType(fileData.getContentType());
-//        log.info("setName = " + fileData.getName().substring(fileData.getName().lastIndexOf(".")+1));
-        format.setName(fileData.getName().substring(fileData.getName().indexOf(".")));
+//        byte[] encodeBase64 = Base64.encodeBase64(fileData.getBytes());
+//        String base64Encoded = null;
+//        try {
+//            base64Encoded = new String(encodeBase64, "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        format.setIcon(base64Encoded);
+//        format.setMediaType(fileData.getContentType());
+////        log.info("setName = " + fileData.getName().substring(fileData.getName().lastIndexOf(".")+1));
+//        format.setName(fileData.getName().substring(fileData.getName().indexOf(".")));
         return format;
     }
 
@@ -173,24 +166,78 @@ public class CreateThings {
         return newFileFormat(fileData);
     }
 
-    private static File generateFile(String filename, String ext, boolean isEmpty) throws IOException {
-        final File tempFile = File.createTempFile(filename, "." + ext);
-        tempFile.deleteOnExit();
-        OutputStream is = new FileOutputStream(tempFile);
-        if (!isEmpty) {
-            IntStream.generate(() -> (int) (Math.random() * 100000))
-                    .limit(500)
-                    .forEach(curInt -> {
-                        try {
-                            is.write(curInt);
-                        } catch (IOException e) {
-                            log.error(e);
-                        }
-                    });
+    private static File generateFile(String filename, String ext, boolean isEmpty) {
+        File tempFile;
+        try {
+            tempFile = File.createTempFile(filename, "." + ext);
+            tempFile.deleteOnExit();
+            OutputStream is = new FileOutputStream(tempFile);
+            if (!isEmpty) {
+                IntStream.generate(() -> (int) (Math.random() * 100000))
+                        .limit(500)
+                        .forEach(curInt -> {
+                            try {
+                                is.write(curInt);
+                            } catch (IOException e) {
+                                log.error(e);
+                            }
+                        });
+            }
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            tempFile = null;
         }
-        is.close();
         return tempFile;
     }
+
+    public static MultipartFile getFileByStatus(UploadStatuses status) {
+        switch (status) {
+            case EMPTY:
+                return newMultipartFile("Empty", "empty", true);
+            case WRONG_FORMAT:
+                return newMultipartFile("WrongFormat", "wrongFormat", false);
+            case SUCCESS:
+                return newMultipartFile("Success", "success", false);
+            case BAD_ENCODE:
+                break;
+            case UNKNOW:
+                break;
+        }
+        return null;
+    }
+
+    public static MultipartFile[] getFiles(Map<UploadStatuses, MultipartFile> allTypesFilesMap) {
+        return allTypesFilesMap.values().toArray(new MultipartFile[]{});
+    }
+
+    public static String[] getStatus(Map<UploadStatuses, MultipartFile> allTypesFilesMap) {
+        return allTypesFilesMap.keySet().stream().map(x -> x.getStatus(allTypesFilesMap.get(x).getOriginalFilename())).toArray(String[]::new);
+    }
+
+//
+//
+//    public static Map<MultipartFile, String> newMultipartFileArray2(UploadStatuses[] uploadStatuses) {
+//        MultipartFile[] files = CreateThings.newMultipartFileArray(uploadStatuses);
+////                new String[]{"normal", "empty", "wrong"},
+////                new String[]{"doc", "docx", "wrg"},
+////                new boolean[]{false, true, false});
+//
+//
+//
+//        String[] originalResults = new String[3];
+//        originalResults[0] = UploadStatuses.SUCCESS.getStatus(files[0].getOriginalFilename());
+//        originalResults[1] = UploadStatuses.EMPTY.getStatus(files[1].getOriginalFilename());
+//        originalResults[2] = UploadStatuses.WRONG_FORMAT.getStatus(files[2].getOriginalFilename());
+//
+//
+//
+//        AttachmentIntegrationTest.StartingData startingData = new AttachmentIntegrationTest.StartingData();
+//        startingData.setFiles(files);
+//        startingData.setFilesUploadStatus(originalResults);
+//
+//        return
+//    }
 
 
 }
