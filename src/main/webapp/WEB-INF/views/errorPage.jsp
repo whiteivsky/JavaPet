@@ -19,14 +19,18 @@
     <p> error: ${error} </p>
     <p> message: ${message} </p>
     <p> path: ${path} </p>
-        <h2>Oops! This OUR Page</h2>
+    <h2>Oops! This OUR Page</h2>
 </div>
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
     gtag('js', new Date());
 
     gtag('config', 'UA-23581568-13');

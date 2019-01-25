@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.common.CreateThings;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @Log4j
-@PropertySource(value = {"classpath:/uploadStatuses.properties"})
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ServiceTestConfig.class})
 public class AttachmentIntegrationTest {
@@ -51,6 +50,7 @@ public class AttachmentIntegrationTest {
     UserService userService;
     @Mock
     FileFormatServiceImpl fileFormatService;
+
     @Autowired
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
@@ -59,10 +59,11 @@ public class AttachmentIntegrationTest {
     private MultipartFile fileEmpty = CreateThings.getFileByStatus(UploadStatuses.EMPTY);
     private MultipartFile fileWrongFormat = CreateThings.getFileByStatus(UploadStatuses.WRONG_FORMAT);
     private Map<UploadStatuses, MultipartFile> allTypesFilesMap = new HashMap<>();
+
     {
-        allTypesFilesMap.put(UploadStatuses.SUCCESS,fileSuccess);
-        allTypesFilesMap.put(UploadStatuses.EMPTY,fileEmpty);
-        allTypesFilesMap.put(UploadStatuses.WRONG_FORMAT,fileWrongFormat);
+        allTypesFilesMap.put(UploadStatuses.SUCCESS, fileSuccess);
+        allTypesFilesMap.put(UploadStatuses.EMPTY, fileEmpty);
+        allTypesFilesMap.put(UploadStatuses.WRONG_FORMAT, fileWrongFormat);
     }
 
 
@@ -93,7 +94,7 @@ public class AttachmentIntegrationTest {
 
         List<String> results = attachmentService.saveAttachments("", new MultipartFile[]{fileSuccess});
 
-        assertEquals(UploadStatuses.UNKNOW.getStatus(new Exception().getLocalizedMessage()),results.get(0));
+        assertEquals(UploadStatuses.UNKNOW.getStatus(new Exception().getLocalizedMessage()), results.get(0));
     }
 
     @Test
@@ -107,7 +108,7 @@ public class AttachmentIntegrationTest {
 
     @Test
     public void selectAttachmentByIDTest() throws Exception {
-//        when(attachDAO.selectAttachByID(1)).thenReturn(CreateThings.newAttach(1));
+//        when(attachDAO.selectAttachByID(anyInt())).thenReturn(CreateThings.newAttach(1));
         assertEquals(CreateThings.newAttach(1), attachmentService.selectAttachmentByID(1));
     }
 
@@ -132,11 +133,6 @@ public class AttachmentIntegrationTest {
         when(attachDAO.selectAttachesbyUser(user)).thenReturn(attachList);
         return attachList;
     }
-
-
-
-
-
 
 
 }

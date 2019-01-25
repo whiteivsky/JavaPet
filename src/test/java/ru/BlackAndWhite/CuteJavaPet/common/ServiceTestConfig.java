@@ -18,7 +18,7 @@ import ru.BlackAndWhite.CuteJavaPet.controllers.ErrorController;
 
 @Log4j
 @Configuration
-@ComponentScan(value = {"ru.BlackAndWhite.CuteJavaPet.*"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,value = ErrorController.class))
+@ComponentScan(value = {"ru.BlackAndWhite.CuteJavaPet.*"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ErrorController.class))
 public class ServiceTestConfig {
 
     @Bean

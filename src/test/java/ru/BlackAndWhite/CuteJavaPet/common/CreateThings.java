@@ -1,13 +1,11 @@
 package ru.BlackAndWhite.CuteJavaPet.common;
 
 import lombok.extern.log4j.Log4j;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.model.Attach;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.model.Group;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
-import ru.BlackAndWhite.CuteJavaPet.serviceIntegrationTests.AttachmentIntegrationTest;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.*;
@@ -15,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static org.mockito.Mockito.when;
 
 @Log4j
 public class CreateThings {
@@ -42,7 +38,9 @@ public class CreateThings {
             }
 
             @Override
-            public String getOriginalFilename() {return newFile.getName();}
+            public String getOriginalFilename() {
+                return newFile.getName();
+            }
 
             @Override
             public String getContentType() {
@@ -60,10 +58,14 @@ public class CreateThings {
             }
 
             @Override
-            public byte[] getBytes() throws IOException {return new byte[0];}
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
 
             @Override
-            public InputStream getInputStream() throws IOException {return new FileInputStream(newFile);}
+            public InputStream getInputStream() throws IOException {
+                return new FileInputStream(newFile);
+            }
 
             @Override
             public void transferTo(File file) throws IOException, IllegalStateException {
@@ -72,8 +74,8 @@ public class CreateThings {
         };
     }
 
-    public static List<User> newUserList(int count) {
-        return IntStream.range(0, count).mapToObj(CreateThings::newUser).collect(Collectors.toList());
+    public static List<User> newUserList(int listSize) {
+        return IntStream.range(0, listSize).mapToObj(CreateThings::newUser).collect(Collectors.toList());
     }
 
     public static User newUser(Integer id) {
@@ -103,9 +105,8 @@ public class CreateThings {
     }
 
     public static List<Group> newGroupList(int listSize) {
-        List<Group> groups = IntStream.range(0, listSize)
+        return IntStream.range(0, listSize)
                 .mapToObj(i -> CreateThings.newGroup()).collect(Collectors.toList());
-        return groups;
     }
 
     public static Attach newAttach(Integer id) {

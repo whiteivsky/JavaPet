@@ -15,7 +15,6 @@ import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

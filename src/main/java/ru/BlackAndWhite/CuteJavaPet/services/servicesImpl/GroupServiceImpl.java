@@ -11,7 +11,6 @@ import ru.BlackAndWhite.CuteJavaPet.services.GroupService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 @Log4j
@@ -65,24 +64,24 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void delUserFromGroup(User user, Group group) {
-        groupDAO.delUserGroup(user, group);
+        groupDAO.delUserFromGroup(user, group);
     }
 
     @Override
     public void addUserToGroup(User user, Group group) {
-        groupDAO.addUserGroup(user, group);
+        groupDAO.addUserToGroup(user, group);
     }
 
 
     public void addUserToGroups(User user, List<Group> groupList) {
         for (Group curGroup : groupList) {
-            groupDAO.addUserGroup(user, curGroup);
+            groupDAO.addUserToGroup(user, curGroup);
         }
     }
 
     public void delUserFromGroups(User user, List<Group> groupList) {
         for (Group curGroup : groupList) {
-            groupDAO.delUserGroup(user, curGroup);
+            groupDAO.delUserFromGroup(user, curGroup);
         }
     }
 
@@ -92,50 +91,55 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void replaceGroupsOfUser(User user, List<Group> groupList) {
+    public void replaceGroupsOfUser(User user, List<Group> newGroupList) {
+        if (user == null) return;
         List<Group> userGroupList = groupDAO.selectGroupsByUserId(user.getId());
-        if (userGroupList == null) return;    //No one group has been loaded
-        if (groupList == null) {              //No one group has been selected - delete all
+        if (userGroupList == null) {
+            //No one group has been loaded
+            addUserToGroups(user, newGroupList);
+            return;
+        }
+        if (newGroupList == null) {
+            //No one group has been selected - delete all
             delUserFromGroups(user, userGroupList);
             return;
         }
-        if ((groupList.size() != userGroupList.size()) ||
-                (!userGroupList.containsAll(groupList))) {
+        if ((newGroupList.size() != userGroupList.size()) ||
+                (!userGroupList.containsAll(newGroupList))) {
             delUserFromGroups(user, userGroupList);
-            addUserToGroups(user, groupList);
+            addUserToGroups(user, newGroupList);
         }
     }
 
+    @Override
     public Object setNewGroupListToUser(String[] applyGroupList, String newGroupName, User currentLoggedUser) {
-        List<String> status = new ArrayList<>();
+        ArrayList<String> status = new ArrayList<>();
+        if (currentLoggedUser == null) return null;
         if (applyGroupList == null) {
             // The array is empty, remove user groups
-            replaceGroupsOfUser(
-                    currentLoggedUser, null);
-            status.add("all groups were deleted");
-            return status;
-        }
-        List<Group> selectedGroupList = Stream.of(applyGroupList)
-                .collect(
-                        () -> new ArrayList<>(),
-                        (list, item) -> list.add(groupDAO.selectGroupByName(item)),
-                        (list1, list2) -> list1.addAll(list2));
+            replaceGroupsOfUser(currentLoggedUser, null);
+        } else {
+            ArrayList<Group> selectedGroupList = new ArrayList<>();
+            for (String item : applyGroupList) {
+                selectedGroupList.add(groupDAO.selectGroupByName(item));
+            }
 
-        replaceGroupsOfUser(
-                currentLoggedUser, selectedGroupList);
-        ((ArrayList) status).addAll(selectedGroupList);
+            replaceGroupsOfUser(
+                    currentLoggedUser, selectedGroupList);
+            selectedGroupList.forEach(x -> status.add(x.getGroupName()));
+        }
 
         // working with new group
-        addNewGroupToUser(newGroupName, currentLoggedUser, (ArrayList) status);
-        return status;
+        return addNewGroupToUser(newGroupName, currentLoggedUser, status);
     }
 
-    private void addNewGroupToUser(String newGroupName, User currentLoggedUser, ArrayList status) {
-        if (!newGroupName.equals("")) {
+    private ArrayList addNewGroupToUser(String newGroupName, User currentLoggedUser, ArrayList<String> status) {
+        if (newGroupName != null && !newGroupName.equals("")) {
             createGroup(newGroupName);
             addUserToGroup(currentLoggedUser,
                     groupDAO.selectGroupByName(newGroupName));
             status.add("add new group '" + newGroupName + "'");
         }
+        return status;
     }
 }
