@@ -1,7 +1,6 @@
 package ru.BlackAndWhite.CuteJavaPet.serviceIntegrationTests;
 
 import lombok.extern.log4j.Log4j;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,20 +12,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.multipart.MultipartFile;
-import ru.BlackAndWhite.CuteJavaPet.common.CreateThings;
 import ru.BlackAndWhite.CuteJavaPet.common.ServiceTestConfig;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.FileFormatDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.FileFormatServiceImpl;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static ru.BlackAndWhite.CuteJavaPet.common.CreateThings.*;
 
 @Log4j
 @PropertySource(value = {"classpath:/uploadStatuses.properties"})
@@ -39,94 +39,85 @@ public class FileFormatServiceImplTest {
     @InjectMocks
     private FileFormatServiceImpl fileFormatService;
 
+    private MultipartFile fileSuccess = getFileByStatus(UploadStatuses.SUCCESS);
+    private MultipartFile fileEmpty = getFileByStatus(UploadStatuses.EMPTY);
+    private MultipartFile fileWrongFormat = getFileByStatus(UploadStatuses.WRONG_FORMAT);
+    private Map<UploadStatuses, MultipartFile> allTypesFilesMap = new HashMap<>();
+
+    {
+        allTypesFilesMap.put(UploadStatuses.SUCCESS, fileSuccess);
+        allTypesFilesMap.put(UploadStatuses.EMPTY, fileEmpty);
+        allTypesFilesMap.put(UploadStatuses.WRONG_FORMAT, fileWrongFormat);
+    }
+
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        doNothing().when(fileFormatDAO).save(any(FileFormat.class));
     }
 
     @Test
-    public void saveManyIcons() throws Exception {
-        MultipartFile[] files = getMultipartFiles();
-        String[] originalResults = setUpSaveOneIcon(files);
+    public void upload_ManyIcons() throws Exception {
+        MultipartFile[] files = getFiles(allTypesFilesMap);
+        String[] originalResults = getStatus(allTypesFilesMap);
 
         List<String> results = fileFormatService.upload(files);
+
         assertEquals("results count", files.length, results.size());
         assertArrayEquals(results.toArray(), originalResults);
     }
 
-    public MultipartFile[] getMultipartFiles() throws IOException {
-        return CreateThings.newMultipartFileArray(
-                new String[]{"txt", "doc", "wrong"},
-                new String[]{"png", "png", "jpg"},
-                new boolean[]{false, true, false});
-    }
-
-    @NotNull
-    public String[] setUpSaveOneIcon(MultipartFile[] files) throws Exception {
-        FileFormat[] fileFormats = CreateThings.newFileFormatArray(files);
-        doNothing().when(fileFormatDAO).save(any(FileFormat.class));
-
-        String[] originalResults = new String[3];
-        originalResults[0] = UploadStatuses.SUCCESS.getStatus(files[0].getOriginalFilename());
-        originalResults[1] = UploadStatuses.EMPTY.getStatus(files[1].getOriginalFilename());
-        originalResults[2] = UploadStatuses.WRONG_FORMAT.getStatus(files[2].getOriginalFilename());
-        return originalResults;
-    }
 
     @Test
     public void saveNull() {
-        try {
-            assertNull(fileFormatService.upload(null));
-        } catch (Exception e) {
-            fail("null upload");
-        }
+        assertNull(fileFormatService.upload(null));
     }
 
     @Test
-    public void saveWithErrors() throws Exception {
-
-        MultipartFile[] multipartFiles = new MultipartFile[1];
-        multipartFiles[0] = CreateThings.newMultipartFile("doc", "png", false);
-        doThrow(UnsupportedEncodingException.class)
-                .when(fileFormatDAO).save(any());
+    public void save_UnsupportedEncodingException() {
+        MultipartFile[] multipartFiles = getFiles(allTypesFilesMap);
+        String[] originalResults = getStatus(allTypesFilesMap);
+        doThrow(UnsupportedEncodingException.class).when(fileFormatDAO).save(any());
 
         List<String> results = fileFormatService.upload(multipartFiles);
-        assertNotNull(results);
-        assertEquals(1, results.size());
-        assertEquals(UploadStatuses.BAD_ENCODE.getStatus(multipartFiles[0].getOriginalFilename()),
-                results.get(0));
 
+        assertArrayEquals(originalResults, results.toArray());
+    }
+
+    @Test
+    public void save_Exception() {
+        MultipartFile[] multipartFiles = getFiles(allTypesFilesMap);
+        String[] originalResults = getStatus(allTypesFilesMap);
         doThrow(Exception.class).when(fileFormatDAO).save(any());
-        results = fileFormatService.upload(multipartFiles);
-        assertNotNull(results);
-        assertEquals(1, results.size());
-        assertEquals(UploadStatuses.UNKNOW.getStatus(new Exception().getLocalizedMessage()),
-                results.get(0));
 
+        List<String> results = fileFormatService.upload(multipartFiles);
+
+        assertArrayEquals(originalResults, results.toArray());
     }
 
 
     @Test
     public void getIconByFilename() throws Exception {
-        FileFormat fileFormat = CreateThings.newFileFormat("doc", "png", false);
-        when(fileFormatDAO.getIconByFilename("doc")).thenReturn(fileFormat);
+        FileFormat fileFormat = newFileFormat("doc", "png", false);
+
         assertEquals(fileFormatService.getIconByFilename("doc"), fileFormat);
         assertNotNull(fileFormatService.getIconByFilename("doc"));
     }
 
     @Test
     public void getAllIcons() throws Exception {
-        FileFormat[] fileFormats = CreateThings.newFileFormatArray(getMultipartFiles());
+        FileFormat[] fileFormats = newFileFormatArray(getFiles(allTypesFilesMap));
         when(fileFormatDAO.getAllIcons()).thenReturn(Arrays.asList(fileFormats));
+
         assertArrayEquals(fileFormatService.getAllIcons().toArray(), fileFormats);
-        assertNotNull(fileFormatService.getAllIcons());
     }
 
     @Test
     public void deleteIconByFilename() {
         fileFormatService.deleteIconByFilename("doc");
+
         verify(fileFormatDAO).deleteIconByFilename("doc");
         verifyNoMoreInteractions(fileFormatDAO);
-
     }
 }
