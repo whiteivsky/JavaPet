@@ -31,6 +31,7 @@ import static ru.BlackAndWhite.CuteJavaPet.common.CreateThings.*;
 //@PropertySource(value = {"classpath:/uploadStatuses.properties"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ServiceTestConfig.class})
+
 public class FileFormatServiceImplTest {
     @Mock
     FileFormatDAO fileFormatDAO;

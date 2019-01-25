@@ -15,8 +15,6 @@ import ru.BlackAndWhite.CuteJavaPet.services.SecurityService;
 @Service
 public class SecurityServiceImpl implements SecurityService {
 
-//    private static final Logger logger = LoggerFactory.getLogger(SecurityServiceImpl.class);
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -31,8 +29,7 @@ public class SecurityServiceImpl implements SecurityService {
             if (userDetails instanceof org.springframework.security.core.userdetails.User) {
                 return ((org.springframework.security.core.userdetails.User) userDetails).getUsername();
             }
-        } catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
             log.error(e);
             return null;
         }
@@ -40,7 +37,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public void autoLogin(String username, String password) throws Exception {
+    public void autoLogin(String username, String password) {
         try {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 

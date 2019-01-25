@@ -48,14 +48,12 @@ public class ServiceTestConfig {
     }
 
     private SqlSessionFactory getSqlSessionFactory() {
-
-        Environment environment = new Environment("development", transactionFactory(), dataSource());
+        Environment environment = new Environment("testing", transactionFactory(), dataSource());
         org.apache.ibatis.session.Configuration myBatisConfig = new org.apache.ibatis.session.Configuration(environment);
 
         myBatisConfig.addMappers("ru.BlackAndWhite.CuteJavaPet.dao.myBatis.mappers");
         myBatisConfig.setMultipleResultSetsEnabled(true);
 
-        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-        return builder.build(myBatisConfig);
+        return new SqlSessionFactoryBuilder().build(myBatisConfig);
     }
 }
