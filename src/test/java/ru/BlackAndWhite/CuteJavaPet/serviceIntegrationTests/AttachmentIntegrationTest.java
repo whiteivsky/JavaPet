@@ -1,8 +1,8 @@
 package ru.BlackAndWhite.CuteJavaPet.serviceIntegrationTests;
 
-
 import lombok.extern.log4j.Log4j;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,22 +16,23 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.common.CreateThings;
 import ru.BlackAndWhite.CuteJavaPet.common.ServiceTestConfig;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.AttachDAO;
-import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.GroupDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.Attach;
 import ru.BlackAndWhite.CuteJavaPet.model.FileFormat;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
+import ru.BlackAndWhite.CuteJavaPet.services.GroupService;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.AttachmentServiceImpl;
 import ru.BlackAndWhite.CuteJavaPet.services.servicesImpl.FileFormatServiceImpl;
-import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +45,7 @@ public class AttachmentIntegrationTest {
     @Mock
     AttachDAO attachDAO;
     @Mock
-    GroupDAO groupDAO;
+    GroupService groupService;
     @Mock
     UserService userService;
     @Mock
@@ -54,68 +55,52 @@ public class AttachmentIntegrationTest {
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    private MultipartFile fileSuccess = CreateThings.getFileByStatus(UploadStatuses.SUCCESS);
+    private MultipartFile fileEmpty = CreateThings.getFileByStatus(UploadStatuses.EMPTY);
+    private MultipartFile fileWrongFormat = CreateThings.getFileByStatus(UploadStatuses.WRONG_FORMAT);
+    private Map<UploadStatuses, MultipartFile> allTypesFilesMap = new HashMap<>();
+
+    {
+        allTypesFilesMap.put(UploadStatuses.SUCCESS, fileSuccess);
+        allTypesFilesMap.put(UploadStatuses.EMPTY, fileEmpty);
+        allTypesFilesMap.put(UploadStatuses.WRONG_FORMAT, fileWrongFormat);
     }
 
-    @NotNull
-    public String[] setUpSaveAttachmentsTest(MultipartFile[] files) throws Exception {
-        when(fileFormatService.getIconByFilename(files[0].getOriginalFilename()))
-                .thenReturn(CreateThings.newFileFormat(files[0]));
-        when(fileFormatService.getIconByFilename(files[1].getOriginalFilename()))
-                .thenReturn(CreateThings.newFileFormat(files[1]));
-        when(fileFormatService.getIconByFilename(files[2].getOriginalFilename()))
-                .thenReturn(null);
-        when(groupDAO.selectGroupsByUserId(1)).thenReturn(CreateThings.newGroupList(1));
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        when(fileFormatService.getIconByFilename(fileSuccess.getOriginalFilename())).thenReturn(new FileFormat());
+        when(fileFormatService.getIconByFilename(fileWrongFormat.getOriginalFilename())).thenReturn(null);
+        when(groupService.selectGroupsByUserId(1)).thenReturn(CreateThings.newGroupList(1));
         when(userService.getCurrentLoggedUser()).thenReturn(CreateThings.newUser(1));
-
-        String[] originalResults = new String[3];
-        originalResults[0] = UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, files[0].getOriginalFilename());
-        originalResults[1] = UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, files[1].getOriginalFilename());
-        originalResults[2] = UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, files[2].getOriginalFilename());
-        return originalResults;
-
+        when(attachDAO.selectAttachByID(1)).thenReturn(CreateThings.newAttach(1));
     }
 
     @Test
-    public void saveAttachmentsTest() throws IOException {
-        MultipartFile[] files = CreateThings.newMultipartFileArray(
-                new String[]{"normal", "empty", "wrong"},
-                new String[]{"doc", "docx", "wrg"},
-                new boolean[]{false, true, false});
-        // first - isNormal,
-        // second - isEmpty,
-        // third - isWrongExt
-        try {
-            String[] originalResults = setUpSaveAttachmentsTest(files);
-            List<String> results = attachmentService.saveAttachments("allFiles", files);
-            assertEquals("result count", files.length, results.size());
-            assertArrayEquals(results.toArray(), originalResults);
-        } catch (Exception e) {
-            fail("Error in upload attach" + e.getLocalizedMessage());
-        }
+    public void saveAttachmentsTest() {
+        MultipartFile[] files = CreateThings.getFiles(allTypesFilesMap);
+        String[] actualStatus = CreateThings.getStatus(allTypesFilesMap);
+
+        List<String> resultStatus = attachmentService.saveAttachments("allFiles", files);
+
+        Assert.assertArrayEquals(resultStatus.toArray(), actualStatus);
     }
 
     @Test
     public void saveAttachmentsWithError() throws Exception {
         doThrow(Exception.class).when(attachDAO).saveAttach(any());
         doThrow(Exception.class).when(attachDAO).addAttachGroups(any(), any());
-        when(fileFormatService.getIconByFilename(anyString())).thenReturn(new FileFormat());
 
-        List<String> results = attachmentService.saveAttachments("", CreateThings.newMultipartFileArray(
-                new String[]{"normal"}, new String[]{"txt"}, new boolean[]{false}));
-        assertNotNull(results);
-        assertEquals(1, results.size());
-        assertEquals(UploadStatusesWrapper.getStatus(UploadStatuses.UNKNOW,
-                new Exception().getLocalizedMessage()),
-                results.get(0));
+        List<String> results = attachmentService.saveAttachments("", new MultipartFile[]{fileSuccess});
+
+        assertEquals(UploadStatuses.UNKNOW.getStatus(new Exception().getLocalizedMessage()), results.get(0));
     }
 
     @Test
     public void saveAttachmetsNullFilesTest() {
         try {
-            assertNotNull(attachmentService.saveAttachments("testDescr", null));
+            attachmentService.saveAttachments("testDescr", null);
         } catch (NullPointerException e) {
             assertEquals(e.getClass().getName(), NullPointerException.class.getName());
         }
@@ -123,7 +108,7 @@ public class AttachmentIntegrationTest {
 
     @Test
     public void selectAttachmentByIDTest() throws Exception {
-        when(attachDAO.selectAttachByID(anyInt())).thenReturn(CreateThings.newAttach(1));
+//        when(attachDAO.selectAttachByID(anyInt())).thenReturn(CreateThings.newAttach(1));
         assertEquals(CreateThings.newAttach(1), attachmentService.selectAttachmentByID(1));
     }
 
@@ -131,7 +116,9 @@ public class AttachmentIntegrationTest {
     public void selectAttachmentsbyUserTest() throws Exception {
         User user = CreateThings.newUser();
         List<Attach> attachList = setUpSelectAttachmentsbyUserTest(user);
+
         List<Attach> attachListTest = attachmentService.selectAttachmentsbyUser(user);
+
         assertNotNull(attachListTest);
         assertEquals(3, attachListTest.size());
         assertEquals(attachList, attachListTest);
@@ -143,8 +130,9 @@ public class AttachmentIntegrationTest {
         attachList.add(CreateThings.newAttach());
         attachList.add(CreateThings.newAttach());
         attachList.add(CreateThings.newAttach());
-        when(attachDAO.selectAttachesbyUser(user))
-                .thenReturn(attachList);
+        when(attachDAO.selectAttachesbyUser(user)).thenReturn(attachList);
         return attachList;
     }
+
+
 }

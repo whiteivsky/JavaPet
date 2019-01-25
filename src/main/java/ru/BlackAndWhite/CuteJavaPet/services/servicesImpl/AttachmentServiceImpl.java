@@ -3,57 +3,47 @@ package ru.BlackAndWhite.CuteJavaPet.services.servicesImpl;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.AttachDAO;
-import ru.BlackAndWhite.CuteJavaPet.dao.interfaces.GroupDAO;
 import ru.BlackAndWhite.CuteJavaPet.model.Attach;
 import ru.BlackAndWhite.CuteJavaPet.model.User;
 import ru.BlackAndWhite.CuteJavaPet.services.AttachmentService;
+import ru.BlackAndWhite.CuteJavaPet.services.GroupService;
 import ru.BlackAndWhite.CuteJavaPet.services.UserService;
 import ru.BlackAndWhite.CuteJavaPet.statuses.UploadStatusesWrapper;
 import ru.BlackAndWhite.CuteJavaPet.statuses.enums.UploadStatuses;
 
-import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j
 @Service
 @PropertySource(value = {"classpath:/email.properties", "classpath:/uploadStatuses.properties"})
 public class AttachmentServiceImpl implements AttachmentService {
-    @Resource
-    Environment env;
+
     @Autowired
     AttachDAO attachDAO;
     @Autowired
-    GroupDAO groupDAO;
+    GroupService groupService;
     @Autowired
     UserService userService;
     @Autowired
     FileFormatServiceImpl fileFormatService;
 
-
     @Override
     public List<String> saveAttachments(String filedescription, MultipartFile[] files) {
-        List<String> list = new ArrayList<>();
-        for (MultipartFile multipartFile : files) {
-            String s = saveAttach(filedescription, multipartFile);
-            list.add(s);
-        }
-        return list;
+        return Arrays.stream(files).map(multipartFile -> saveAttach(filedescription, multipartFile)).collect(Collectors.toList());
     }
 
     private String saveAttach(String fileDescription, MultipartFile fileData) {
-
         if (fileData.isEmpty())
-            return UploadStatusesWrapper.getStatus(
-                    UploadStatuses.EMPTY, fileData.getOriginalFilename());
+            return UploadStatusesWrapper.getStatus(UploadStatuses.EMPTY, fileData.getOriginalFilename());
         if (fileFormatService.getIconByFilename(fileData.getOriginalFilename()) == null)
-            return UploadStatusesWrapper.getStatus(
-                    UploadStatuses.WRONG_FORMAT, fileData.getOriginalFilename());
+            return UploadStatusesWrapper.getStatus(UploadStatuses.WRONG_FORMAT, fileData.getOriginalFilename());
+
         return someSave(fileDescription, fileData);
     }
 
@@ -61,7 +51,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             Attach uploadAttachment = getAttach(fileDescription, fileData);
             attachDAO.saveAttach(uploadAttachment);
-            attachDAO.addAttachGroups(uploadAttachment, groupDAO.selectGroupsByUserId(uploadAttachment.getOwner().getId()));
+            attachDAO.addAttachGroups(uploadAttachment, groupService.selectGroupsByUserId(uploadAttachment.getOwner().getId()));
             return UploadStatusesWrapper.getStatus(UploadStatuses.SUCCESS, uploadAttachment.getFileName());
         } catch (Exception e) {
             log.error(e);

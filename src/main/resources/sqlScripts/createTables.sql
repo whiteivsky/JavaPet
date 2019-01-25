@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS fileformats
 (
   id   int auto_increment primary key,
   name varchar(10) not null,
-  icon CLOB    not null,
+  icon CLOB(max)    not null,
   constraint fileFormats_id_uindex
     unique (id),
   constraint fileFormats_name_uindex

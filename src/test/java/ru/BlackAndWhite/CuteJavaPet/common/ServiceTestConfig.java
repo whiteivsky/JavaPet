@@ -11,12 +11,14 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.BlackAndWhite.CuteJavaPet.controllers.ErrorController;
+//import ru.BlackAndWhite.CuteJavaPet.controllers.CustomErrorController;
 
 @Log4j
 @Configuration
-@ComponentScan(value = {"ru.BlackAndWhite.CuteJavaPet.*"})
-
+@ComponentScan(value = {"ru.BlackAndWhite.CuteJavaPet.*"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ErrorController.class))
 public class ServiceTestConfig {
 
     @Bean
